@@ -25,7 +25,7 @@ public class VistaPrincipal {
             String opcion = teclado.nextLine();
 
             switch (opcion) {
-                case "1": System.out.println("Pendiente (Parte 1)"); break;
+                case "1": new GestionClientesVista(controlador, teclado).menu(); break;
                 case "2": System.out.println("Pendiente (Parte 2)"); break;
                 case "3": System.out.println("Pendiente (Parte 3)"); break;
                 case "4": System.out.println("Pendiente (Parte 4)"); break;
