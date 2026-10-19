@@ -1,4 +1,4 @@
-package objectworks.excepciones;
+package objectworks.modelo.excepciones;
 
 public class HabitacionOcupadaException extends Exception {
     public HabitacionOcupadaException(String mensaje) {
