@@ -1,5 +1,9 @@
 import Classes.*;
-import Enums.EstadoReserva;
+import objectworks.modelo.EstadoReserva;
+import objectworks.modelo.Habitacion;
+import objectworks.modelo.HabitacionEstandar;
+import objectworks.modelo.Hotel;
+import objectworks.modelo.Reserva;
 
 import java.time.LocalDate;
 import java.util.ArrayList;

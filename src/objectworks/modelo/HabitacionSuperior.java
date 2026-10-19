@@ -1,13 +1,11 @@
-package Classes;
+package objectworks.modelo;
 
-import Enums.CategoriaHabitacion;
-
-public class Suite extends Habitacion {
+public class HabitacionSuperior extends Habitacion {
 
     private double precioBaseNoche;
 
-    public Suite(int id, String numero, String planta,
-                 int capacidad, double precioBaseNoche) {
+    public HabitacionSuperior(int id, String numero, String planta,
+                              int capacidad, double precioBaseNoche) {
         super(id, numero, planta, capacidad);
         this.precioBaseNoche = precioBaseNoche;
     }
@@ -22,7 +20,7 @@ public class Suite extends Habitacion {
 
     @Override
     public CategoriaHabitacion getCategoria() {
-        return CategoriaHabitacion.SUITE;
+        return CategoriaHabitacion.SUPERIOR;
     }
 
     @Override

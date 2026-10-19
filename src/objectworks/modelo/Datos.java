@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Datos {
+    // Maps referentes a los Hoteles!
+    private final Map<Integer, Hotel> hoteles = new HashMap<>();
+    private final Map<Integer, Reserva> reservas = new HashMap<>();
+
     // Clientes guardados por DNI: acceso directo y sin duplicados
     private Map<String, Cliente> clientes;
 
@@ -89,6 +93,10 @@ public class Datos {
     private String normalizarDni(String dni) {
         return dni == null ? "" : dni.trim().toUpperCase();
     }
+
+    // ===================== HOTELES =====================
+
+
 
     // ===================== DATOS DE PRUEBA =====================
 

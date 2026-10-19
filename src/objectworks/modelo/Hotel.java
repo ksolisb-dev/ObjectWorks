@@ -1,6 +1,4 @@
-package Classes;
-
-import Enums.CategoriaHabitacion;
+package objectworks.modelo;
 
 import java.util.ArrayList;
 import java.util.List;

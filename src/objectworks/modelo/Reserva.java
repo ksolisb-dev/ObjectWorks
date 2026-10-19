@@ -1,9 +1,8 @@
-package Classes;
+package objectworks.modelo;
 
-import Enums.EstadoReserva;
+import Classes.Cliente;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,13 +16,13 @@ public class Reserva {
 
     private EstadoReserva estado;
     private Hotel hotel;
-    private Cliente cliente;
+    private Classes.Cliente cliente;
     private List<Habitacion> habitaciones = new ArrayList<>();
 
     public Reserva(int id, LocalDate fechaEntrada,
                    LocalDate fechaSalida, int numPersonas,
                    LocalDate fechaCreacion, EstadoReserva estado,
-                   Hotel hotel, Cliente cliente,
+                   Hotel hotel, Classes.Cliente cliente,
                    List<Habitacion> habitaciones)
     {
         this.id = id;
@@ -106,7 +105,7 @@ public class Reserva {
         this.hotel = hotel;
     }
 
-    public Cliente getCliente() {
+    public Classes.Cliente getCliente() {
         return cliente;
     }
 

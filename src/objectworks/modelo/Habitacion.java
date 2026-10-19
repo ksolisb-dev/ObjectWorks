@@ -1,6 +1,4 @@
-package Classes;
-
-import Enums.CategoriaHabitacion;
+package objectworks.modelo;
 
 public abstract class Habitacion {
     private int id;
