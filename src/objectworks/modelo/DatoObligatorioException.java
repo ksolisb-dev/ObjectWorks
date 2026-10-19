@@ -1,4 +1,4 @@
-package objectworks.modelo.excepciones;
+package objectworks.modelo;
 
 public class DatoObligatorioException extends Exception {
     public DatoObligatorioException(String mensaje) {
