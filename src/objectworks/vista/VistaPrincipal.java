@@ -2,6 +2,10 @@ package objectworks.vista;
 
 import java.util.Scanner;
 import objectworks.controlador.Controlador;
+import objectworks.modelo.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 
 public class VistaPrincipal {
     private Controlador controlador;

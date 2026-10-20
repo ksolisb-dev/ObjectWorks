@@ -2,17 +2,14 @@ package objectworks.controlador;
 
 import java.util.ArrayList;
 import java.util.List;
-import objectworks.modelo.Cliente;
-import objectworks.modelo.ClienteDuplicadoException;
-import objectworks.modelo.ClienteNoEncontradoException;
-import objectworks.modelo.DatoInvalidoException;
-import objectworks.modelo.Datos;
+import objectworks.modelo.*; // Truco, con esto importa todas las clases que haya en modelo
+import java.time.LocalDate;
 
 public class Controlador {
     private Datos datos;
 
     public Controlador() {
-        datos = new Datos();
+        this.datos = new Datos(); // ahora datos() ya carga las cosas asi que te borro lo de cargar lo de prueba
     }
 
     // ===================== CLIENTES =====================
@@ -50,5 +47,30 @@ public class Controlador {
             resultado.add(c.toString());
         }
         return resultado;
+    }
+
+    // ===================== HOTELES =====================
+    // No las he testeado mucho....
+    public List<Hotel> listarHoteles() {
+        return datos.listarHoteles();
+    }
+
+    public List<Hotel> buscarHotelesPorCiudad(String ciudad) throws DatoObligatorioException {
+        return datos.buscarHotelesPorCiudad(ciudad);
+    }
+
+    public List<Habitacion> habitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
+            throws HotelNoEncontradoException, FechasInvalidasException {
+        return datos.getHabitacionesDisponibles(hotelId, entrada, salida);
+    }
+
+    public List<Habitacion> habitacionesPorCategoria(int hotelId, CategoriaHabitacion categoria)
+            throws HotelNoEncontradoException {
+        return datos.getHabitacionesPorCategoria(hotelId, categoria);
+    }
+
+    public int numHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
+            throws HotelNoEncontradoException, FechasInvalidasException {
+        return datos.getNumHabitacionesDisponibles(hotelId, entrada, salida);
     }
 }
