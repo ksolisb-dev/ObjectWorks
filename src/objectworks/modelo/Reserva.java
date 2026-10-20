@@ -1,7 +1,5 @@
 package objectworks.modelo;
 
-import Classes.Cliente;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,13 +14,13 @@ public class Reserva {
 
     private EstadoReserva estado;
     private Hotel hotel;
-    private Classes.Cliente cliente;
+    private Cliente cliente;
     private List<Habitacion> habitaciones = new ArrayList<>();
 
     public Reserva(int id, LocalDate fechaEntrada,
                    LocalDate fechaSalida, int numPersonas,
                    LocalDate fechaCreacion, EstadoReserva estado,
-                   Hotel hotel, Classes.Cliente cliente,
+                   Hotel hotel, Cliente cliente,
                    List<Habitacion> habitaciones)
     {
         this.id = id;
@@ -105,7 +103,7 @@ public class Reserva {
         this.hotel = hotel;
     }
 
-    public Classes.Cliente getCliente() {
+    public Cliente getCliente() {
         return cliente;
     }
 
@@ -151,7 +149,7 @@ public class Reserva {
                 ", fechaCreacion=" + fechaCreacion +
                 ", estado=" + estado +
                 ", hotelId=" + (hotel != null ? hotel.getId() : null) +
-                ", clienteId=" + (cliente != null ? cliente.getId() : null) +
+                ", clienteId=" + (cliente != null ? cliente.getDni() : null) +
                 ", habitaciones=" + habitaciones.size() +
                 '}';
     }
