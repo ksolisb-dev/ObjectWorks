@@ -151,8 +151,9 @@ public class Reserva {
         return precioTotalPorNoche * noches;
     }
 
+    // Cambia el estado de la reserva a CANCELADA, de momento tiene sentido.
     public void cancelar() {
-        //TODO
+        this.estado = EstadoReserva.CANCELADA;
     }
 
     @Override
