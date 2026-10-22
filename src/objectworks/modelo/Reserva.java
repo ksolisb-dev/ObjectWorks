@@ -37,6 +37,8 @@ public class Reserva {
         if (habitaciones != null) {
             this.habitaciones.addAll(habitaciones);
         }
+
+        this.importe = calcularImporte(); // Calculamos ahora el importe inicial de la reserva basado en las habitaciones y las fechas.
     }
 
     //Getters y setters
@@ -74,11 +76,8 @@ public class Reserva {
     }
 
     public double getImporte() {
-        return importe;
-    }
-
-    public void setImporte(double importe) {
-        this.importe = importe;
+        this.importe = calcularImporte();
+        return this.importe;
     }
 
     public LocalDate getFechaCreacion() {
@@ -120,7 +119,7 @@ public class Reserva {
     public void agregarHabitacion(Habitacion habitacion) {
         if (habitacion != null && !habitaciones.contains(habitacion)) {
             habitaciones.add(habitacion);
-            importe = calcularImporte();
+            this.importe = calcularImporte();
         }
     }
 
@@ -163,7 +162,7 @@ public class Reserva {
                 ", fechaEntrada=" + fechaEntrada +
                 ", fechaSalida=" + fechaSalida +
                 ", numPersonas=" + numPersonas +
-                ", importe=" + importe +
+                ", importe=" + getImporte() +
                 ", fechaCreacion=" + fechaCreacion +
                 ", estado=" + estado +
                 ", hotelId=" + (hotel != null ? hotel.getId() : null) +
