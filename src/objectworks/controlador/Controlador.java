@@ -77,4 +77,21 @@ public class Controlador {
 
     // ===================== HABITACIONES =====================
 
+    public Lista<Habitacion> listarHabitacionesHotel(int hotelId)
+            throws HotelNoEncontradoException {
+        return datos.getHabitacionesHotel(hotelId);
+    }
+
+    public Lista<Habitacion> getHabitacionesDisponibles(
+            int hotelId, LocalDate entrada, LocalDate salida)
+            throws HotelNoEncontradoException, FechasInvalidasException {
+        return datos.getHabitacionesDisponibles(hotelId, entrada, salida);
+    }
+
+    public Lista<Habitacion> filtrarHabitacionesPorPersonas(
+            int hotelId, int numPersonas)
+            throws HotelNoEncontradoException {
+        return datos.filtrarHabitacionesPorPersonas(hotelId, numPersonas);
+    }
+
 }
