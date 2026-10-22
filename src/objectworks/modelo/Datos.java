@@ -173,6 +173,11 @@ public class Datos {
         return true;
     }
 
+    public Lista<Habitacion> getHabitacionesHotel(int hotelId) throws HotelNoEncontradoException{
+        Hotel hotel = buscarHotelPorId(hotelId);
+        return hotel.getHabitaciones();
+    }
+
     // Función que dado un hotel y un rango de fechas devuelve la lista de habitaciones disponibles
     public Lista<Habitacion> getHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
             throws HotelNoEncontradoException, FechasInvalidasException {
