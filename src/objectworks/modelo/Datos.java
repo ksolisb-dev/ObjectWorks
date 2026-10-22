@@ -3,7 +3,8 @@ package objectworks.modelo;
 import objectworks.modelo.enums.CategoriaHabitacion;
 import objectworks.modelo.enums.EstadoReserva;
 import objectworks.modelo.exceptions.*;
-
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -272,5 +273,67 @@ public class Datos {
             hotel.agregarHabitacion(new HabitacionSuperior(202, "202", "2", 3, 145.0));
             hotel.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
         }
+    }
+
+    //------------------------PARTE 5: CONSULTA DE RESERVAS-------------------------
+
+    private Lista<Reserva> ordenarReservas(Lista<Reserva> lista) {
+
+        lista.sort(Comparator.comparing(Reserva::getFechaEntrada));
+        return lista;
+    }
+
+    public Lista<Reserva> listarTodasLasReservas() {
+        return ordenarReservas(new ArrayList<>(reservas.values()));
+    }
+
+    public Lista<Reserva> buscarReservasPorClientes(String dni) {
+        Lista<Reserva> resultado = new ArrayList<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getCliente() !=null && r.getCliente().getDni().equalsIgnoreCase(dni)) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    public Lista<Reserva> buscarReservasPorHotel(int hotelId) {
+        Lista<Reserva> resultado = new ArrayList<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getHotel() != null && r.getHotel().getId() == hotelId) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    public Lista<Reserva> buscarReservasPorFechaEntrada(LocalDate fecha) {
+        Lista<Reserva> resultado = new ArrayList<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getFechaEntrada() != null && r.getFechaEntrada().equals(fecha)) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    public Lista<Reserva> buscarReservasPorFechaSalida(LocalDate fecha) {
+        Lista<Reserva> resultado = new ArrayList<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getFechaSalida() != null && r.getFechaSalida().equals(fecha)) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    public Lista<Reserva> buscarReservasPorEstado(EstadoReserva estado) {
+        Lista<Reserva> resultado = new ArrayList<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getEstado() == estado) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
     }
 }
