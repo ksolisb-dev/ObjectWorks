@@ -30,7 +30,7 @@ public abstract class Habitacion {
         return numero;
     }
 
-    public void getNumero(String numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 
