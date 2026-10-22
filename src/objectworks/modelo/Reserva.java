@@ -144,7 +144,8 @@ public class Reserva {
         int noches = calcularNoches();
         double precioTotalPorNoche = 0.0;
 
-        for (Habitacion habitacion : habitaciones) {
+        for (int i = 0; i < habitaciones.size(); i++) {
+            Habitacion habitacion = habitaciones.getAt(i);
             precioTotalPorNoche += habitacion.calcularPrecioPorNoche();
         }
 
