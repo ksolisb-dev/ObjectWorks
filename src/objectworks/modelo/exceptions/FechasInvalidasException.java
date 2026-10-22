@@ -1,4 +1,4 @@
-package objectworks.modelo;
+package objectworks.modelo.exceptions;
 
 public class FechasInvalidasException extends Exception {
     public FechasInvalidasException(String mensaje) {

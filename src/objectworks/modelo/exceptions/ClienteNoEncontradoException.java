@@ -1,4 +1,4 @@
-package objectworks.modelo;
+package objectworks.modelo.exceptions;
 
 public class ClienteNoEncontradoException extends Exception {
     public ClienteNoEncontradoException(String mensaje) {

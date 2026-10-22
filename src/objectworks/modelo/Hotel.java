@@ -11,7 +11,7 @@ public class Hotel {
     private int estrellas;
     private String telefono;
 
-    private List<Habitacion> habitaciones = new ArrayList<>();
+    private Lista<Habitacion> habitaciones = new Lista<>();
 
     public Hotel(int id, String nombre, String ciudad,
                  String direccion, int estrellas, String telefono) {
@@ -74,26 +74,13 @@ public class Hotel {
     }
 
     public void agregarHabitacion(Habitacion habitacion) {
-        if (habitacion != null && !habitaciones.contains(habitacion)) {
+        if (habitacion != null && !habitaciones.lista.contains(habitacion)) {
             habitaciones.add(habitacion);
         }
     }
 
-    public List<Habitacion> getHabitaciones() {
+    public Lista<Habitacion> getHabitaciones() {
         return habitaciones;
-    }
-
-    //Funciones
-
-    public List<Habitacion> habitacionesPorCategoria(
-            CategoriaHabitacion categoria) {
-        //TODO
-        return null;
-    }
-
-    public int contarDisponibles() {
-        //TODO
-        return 0;
     }
 
     @Override

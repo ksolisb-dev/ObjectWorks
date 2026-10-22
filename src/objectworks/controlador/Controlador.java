@@ -1,8 +1,9 @@
 package objectworks.controlador;
 
-import java.util.ArrayList;
-import java.util.List;
 import objectworks.modelo.*; // Truco, con esto importa todas las clases que haya en modelo
+import objectworks.modelo.enums.CategoriaHabitacion;
+import objectworks.modelo.exceptions.*;
+
 import java.time.LocalDate;
 
 public class Controlador {
@@ -15,11 +16,11 @@ public class Controlador {
     // ===================== CLIENTES =====================
     // Devolvemos texto para que la Vista no toque clases del Modelo
 
-    public List<String> listarClientes() {
+    public Lista<String> listarClientes() {
         return aTexto(datos.listarClientes());
     }
 
-    public List<String> buscarClientes(String texto) {
+    public Lista<String> buscarClientes(String texto) {
         return aTexto(datos.buscarClientes(texto));
     }
 
@@ -41,9 +42,9 @@ public class Controlador {
         datos.eliminarCliente(dni);
     }
 
-    private List<String> aTexto(List<Cliente> lista) {
-        List<String> resultado = new ArrayList<>();
-        for (Cliente c : lista) {
+    private Lista<String> aTexto(Lista<Cliente> lista) {
+        Lista<String> resultado = new Lista<>();
+        for (Cliente c : lista.getArrayList()) {
             resultado.add(c.toString());
         }
         return resultado;
@@ -51,20 +52,20 @@ public class Controlador {
 
     // ===================== HOTELES =====================
     // No las he testeado mucho....
-    public List<Hotel> listarHoteles() {
+    public Lista<Hotel> listarHoteles() {
         return datos.listarHoteles();
     }
 
-    public List<Hotel> buscarHotelesPorCiudad(String ciudad) throws DatoObligatorioException {
+    public Lista<Hotel> buscarHotelesPorCiudad(String ciudad) throws DatoObligatorioException {
         return datos.buscarHotelesPorCiudad(ciudad);
     }
 
-    public List<Habitacion> habitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
+    public Lista<Habitacion> habitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
             throws HotelNoEncontradoException, FechasInvalidasException {
         return datos.getHabitacionesDisponibles(hotelId, entrada, salida);
     }
 
-    public List<Habitacion> habitacionesPorCategoria(int hotelId, CategoriaHabitacion categoria)
+    public Lista<Habitacion> habitacionesPorCategoria(int hotelId, CategoriaHabitacion categoria)
             throws HotelNoEncontradoException {
         return datos.getHabitacionesPorCategoria(hotelId, categoria);
     }
@@ -73,4 +74,7 @@ public class Controlador {
             throws HotelNoEncontradoException, FechasInvalidasException {
         return datos.getNumHabitacionesDisponibles(hotelId, entrada, salida);
     }
+
+    // ===================== HABITACIONES =====================
+
 }

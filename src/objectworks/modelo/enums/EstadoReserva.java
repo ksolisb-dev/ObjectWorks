@@ -1,4 +1,4 @@
-package objectworks.modelo;
+package objectworks.modelo.enums;
 
 public enum EstadoReserva {
     CONFIRMADA,

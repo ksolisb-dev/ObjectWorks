@@ -1,9 +1,11 @@
 package objectworks.modelo;
 
-import java.util.ArrayList;
+import objectworks.modelo.enums.CategoriaHabitacion;
+import objectworks.modelo.enums.EstadoReserva;
+import objectworks.modelo.exceptions.*;
+
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.time.LocalDate;
 
@@ -23,6 +25,7 @@ public class Datos {
             // coge lo que sea que haya petado!
             cargarClientesPrueba();
             cargarHotelesPrueba();
+            cargarHabitacionesPrueba();
         } catch (Exception e) {
             System.err.println("Error cargando datos de prueba: " + e.getMessage());
         }
@@ -30,14 +33,14 @@ public class Datos {
 
     // ===================== CLIENTES =====================
 
-    public List<Cliente> listarClientes() {
-        List<Cliente> lista = new ArrayList<>(clientes.values());
+    public Lista<Cliente> listarClientes() {
+        Lista<Cliente> lista = new Lista<>(clientes.values());
         lista.sort(Comparator.comparing(Cliente::getApellidos));
         return lista;
     }
 
-    public List<Cliente> buscarClientes(String texto) {
-        List<Cliente> resultado = new ArrayList<>();
+    public Lista<Cliente> buscarClientes(String texto) {
+        Lista<Cliente> resultado = new Lista<>();
         String busqueda = texto.trim().toLowerCase();
         for (Cliente c : clientes.values()) {
             if (c.getNombre().toLowerCase().contains(busqueda)
@@ -119,16 +122,16 @@ public class Datos {
     }
 
     // Lista lo que sea que hay en el Array de hoteles
-    public List<Hotel> listarHoteles() {
-        return new ArrayList<>(hoteles.values());
+    public Lista<Hotel> listarHoteles() {
+        return new Lista<>(hoteles.values());
     }
 
     // Función con mínimo control de excepciones para buscar hoteles por ciudad
-    public List<Hotel> buscarHotelesPorCiudad(String ciudad) throws DatoObligatorioException {
+    public Lista<Hotel> buscarHotelesPorCiudad(String ciudad) throws DatoObligatorioException {
         Validador.validarCampoObligatorio(ciudad, "ciudad");
 
 
-        List<Hotel> resultado = new ArrayList<>();
+        Lista<Hotel> resultado = new Lista<>();
 
         String busqueda = ciudad.trim().toLowerCase();
 
@@ -171,16 +174,16 @@ public class Datos {
     }
 
     // Función que dado un hotel y un rango de fechas devuelve la lista de habitaciones disponibles
-    public List<Habitacion> getHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
+    public Lista<Habitacion> getHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
             throws HotelNoEncontradoException, FechasInvalidasException {
 
         Validador.validarFechas(entrada, salida);
         Hotel hotel = buscarHotelPorId(hotelId);
 
-        List<Habitacion> listaDisponibles = new ArrayList<>();
+        Lista<Habitacion> listaDisponibles = new Lista<>();
 
 
-        for (Habitacion habitacion : hotel.getHabitaciones()) {
+        for (Habitacion habitacion : hotel.getHabitaciones().getArrayList()) {
             if (estaDisponible(habitacion, entrada, salida)) {
                 listaDisponibles.add(habitacion);
             }
@@ -190,13 +193,13 @@ public class Datos {
     }
 
     // Función clonada de la de arriba pero que itera por categorías sin tener en cuenta fechas
-    public List<Habitacion> getHabitacionesPorCategoria(int hotelId, CategoriaHabitacion categoria)
+    public Lista<Habitacion> getHabitacionesPorCategoria(int hotelId, CategoriaHabitacion categoria)
             throws HotelNoEncontradoException {
 
         Hotel hotel = buscarHotelPorId(hotelId);
-        List<Habitacion> habitacionesCategoria = new ArrayList<>();
+        Lista<Habitacion> habitacionesCategoria = new Lista<>();
 
-        for (Habitacion h : hotel.getHabitaciones()) {
+        for (Habitacion h : hotel.getHabitaciones().getArrayList()) {
             if (h.getCategoria() == categoria) {
                 habitacionesCategoria.add(h);
             }
@@ -209,8 +212,28 @@ public class Datos {
     public int getNumHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
             throws HotelNoEncontradoException, FechasInvalidasException {
 
-        List<Habitacion> disponibles = getHabitacionesDisponibles(hotelId, entrada, salida);
+        Lista<Habitacion> disponibles = getHabitacionesDisponibles(hotelId, entrada, salida);
         return disponibles.size();
+    }
+
+    public Lista<Habitacion> filtrarHabitacionesPorPersonas(
+            int hotelId, int numPersonas)
+            throws HotelNoEncontradoException {
+
+        Hotel hotel = buscarHotelPorId(hotelId);
+        Lista<Habitacion> resultado = new Lista<>();
+
+        if (numPersonas <= 0) {
+            return resultado;
+        }
+
+        for (Habitacion habitacion : hotel.getHabitaciones().getArrayList()) {
+            if (habitacion.getCapacidad() >= numPersonas) {
+                resultado.add(habitacion);
+            }
+        }
+
+        return resultado;
     }
 
     // ===================== DATOS DE PRUEBA =====================
@@ -233,17 +256,16 @@ public class Datos {
         addHotel(h2);
         addHotel(h3);
 
-        // Añade habitaciones de ejemplo (ajusta los constructores si los tuyos son distintos)
-        h1.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 85.0));
-        h1.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 120.0));
-        h1.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
+    }
 
-        h2.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 75.0));
-        h2.agregarHabitacion(new HabitacionEstandar(102, "102", "1", 2, 75.0));
-        h2.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 3, 110.0));
-
-        h3.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 80.0));
-        h3.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 115.0));
-        h3.agregarHabitacion(new Suite(301, "301", "3", 4, 170.0));
+    public void cargarHabitacionesPrueba() {
+        for (int i = 1; i<=hoteles.size(); i++) {
+            Hotel hotel = hoteles.get(i);
+            hotel.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 85.0));
+            hotel.agregarHabitacion(new HabitacionEstandar(102, "102", "1", 3, 115.0));
+            hotel.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 120.0));
+            hotel.agregarHabitacion(new HabitacionSuperior(202, "202", "2", 3, 145.0));
+            hotel.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
+        }
     }
 }
