@@ -4,6 +4,8 @@ import objectworks.modelo.enums.EstadoReserva;
 
 import java.time.LocalDate;
 
+import java.time.temporal.ChronoUnit;
+
 public class Reserva {
     private int id;
     private LocalDate fechaEntrada;
@@ -123,15 +125,31 @@ public class Reserva {
     }
 
     //Funciones
-
+    
+    // Validar que las fechas no sean nulas y que la fecha de salida sea posterior a la fecha de entrada
+    // La diferencia entre entrada y salida representa el número de noches de la reserva
     public int calcularNoches() {
-        //TODO
-        return 0;
+        if (fechaEntrada == null || fechaSalida == null) {
+            throw new IllegalStateException("Las fechas de entrada y salida deben estar definidas.");
+        }
+
+        if (!fechaSalida.isAfter(fechaEntrada)) {
+            throw new IllegalArgumentException("La fecha de salida debe ser posterior a la fecha de entrada.");
+        }
+
+        return Math.toIntExact(ChronoUnit.DAYS.between(fechaEntrada, fechaSalida));
     }
 
+    // Calcula el precio total de una reserva con n_noches * precio_por_noche de cada habitación.
     public double calcularImporte() {
-        //TODO
-        return 0;
+        int noches = calcularNoches();
+        double precioTotalPorNoche = 0.0;
+
+        for (Habitacion habitacion : habitaciones) {
+            precioTotalPorNoche += habitacion.calcularPrecioPorNoche();
+        }
+
+        return precioTotalPorNoche * noches;
     }
 
     public void cancelar() {
