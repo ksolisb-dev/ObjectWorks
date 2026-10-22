@@ -9,7 +9,6 @@ import objectworks.modelo.exceptions.FechasInvalidasException;
 import objectworks.modelo.exceptions.HotelNoEncontradoException;
 
 import java.time.LocalDate;
-import java.util.List;
 
 public class VistaPrincipal {
     private Controlador controlador;
@@ -87,11 +86,11 @@ public class VistaPrincipal {
     }
 
     private void listarHoteles() {
-        List<Hotel> hoteles = controlador.listarHoteles();
+        Lista<Hotel> hoteles = controlador.listarHoteles();
         if (hoteles.isEmpty()) {
             System.out.println("No hay hoteles");
         } else {
-            for (Hotel h : hoteles) {
+            for (Hotel h : hoteles.getArrayList()) {
                 System.out.println(h);
             }
         }
@@ -100,11 +99,11 @@ public class VistaPrincipal {
     private void buscarPorCiudad() throws DatoObligatorioException {
         System.out.print("Ciudad: ");
         String ciudad = teclado.nextLine();
-        List<Hotel> hoteles = controlador.buscarHotelesPorCiudad(ciudad);
+        Lista<Hotel> hoteles = controlador.buscarHotelesPorCiudad(ciudad);
         if (hoteles.isEmpty()) {
             System.out.println("No se encontraron hoteles");
         } else {
-            for (Hotel h : hoteles) {
+            for (Hotel h : hoteles.getArrayList()) {
                 System.out.println(h);
             }
         }
@@ -118,11 +117,11 @@ public class VistaPrincipal {
         System.out.print("Fecha salida (yyyy-MM-dd): ");
         LocalDate salida = LocalDate.parse(teclado.nextLine());
 
-        List<Habitacion> habs = controlador.habitacionesDisponibles(id, entrada, salida);
+        Lista<Habitacion> habs = controlador.habitacionesDisponibles(id, entrada, salida);
         if (habs.isEmpty()) {
             System.out.println("No hay habitaciones disponibles");
         } else {
-            for (Habitacion h : habs) {
+            for (Habitacion h : habs.getArrayList()) {
                 System.out.println(h);
             }
         }
@@ -149,11 +148,11 @@ public class VistaPrincipal {
             return;
         }
 
-        List<Habitacion> habs = controlador.habitacionesPorCategoria(id, categoria);
+        Lista<Habitacion> habs = controlador.habitacionesPorCategoria(id, categoria);
         if (habs.isEmpty()) {
             System.out.println("No hay habitaciones de esa categoria");
         } else {
-            for (Habitacion h : habs) {
+            for (Habitacion h : habs.getArrayList()) {
                 System.out.println(h);
             }
         }

@@ -1,8 +1,8 @@
 package objectworks.vista;
 
-import java.util.List;
 import java.util.Scanner;
 import objectworks.controlador.Controlador;
+import objectworks.modelo.Lista;
 
 public class GestionClientesVista {
     private Controlador controlador;
@@ -99,11 +99,11 @@ public class GestionClientesVista {
         return teclado.nextLine();
     }
 
-    private void mostrarLista(List<String> lista) {
+    private void mostrarLista(Lista<String> lista) {
         if (lista.isEmpty()) {
             System.out.println("No hay resultados");
         } else {
-            for (String linea : lista) {
+            for (String linea : lista.getArrayList()) {
                 System.out.println(linea);
             }
         }
