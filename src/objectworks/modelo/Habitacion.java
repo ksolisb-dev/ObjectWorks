@@ -1,5 +1,7 @@
 package objectworks.modelo;
 
+import objectworks.modelo.enums.CategoriaHabitacion;
+
 public abstract class Habitacion {
     private int id;
     private String numero;
@@ -55,11 +57,6 @@ public abstract class Habitacion {
     public abstract double calcularPrecioNoche();
 
     public abstract double getPrecioBaseNoche();
-
-    public boolean estaDisponible() {
-        //TODO
-        return false;
-    }
 
     @Override
     public String toString() {

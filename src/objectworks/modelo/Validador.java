@@ -1,5 +1,8 @@
 package objectworks.modelo;
 
+import objectworks.modelo.exceptions.DatoObligatorioException;
+import objectworks.modelo.exceptions.FechasInvalidasException;
+
 import java.time.LocalDate;
 import java.util.regex.Pattern;
 
@@ -50,10 +53,4 @@ public class Validador {
             throw new DatoObligatorioException("El número de personas debe ser mayor que 0.");
         }
     }
-
-
-
-
-
-
 }

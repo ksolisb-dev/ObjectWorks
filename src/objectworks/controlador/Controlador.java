@@ -3,6 +3,9 @@ package objectworks.controlador;
 import java.util.ArrayList;
 import java.util.List;
 import objectworks.modelo.*; // Truco, con esto importa todas las clases que haya en modelo
+import objectworks.modelo.enums.CategoriaHabitacion;
+import objectworks.modelo.exceptions.*;
+
 import java.time.LocalDate;
 
 public class Controlador {

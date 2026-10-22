@@ -1,5 +1,9 @@
 package objectworks.modelo;
 
+import objectworks.modelo.enums.CategoriaHabitacion;
+import objectworks.modelo.enums.EstadoReserva;
+import objectworks.modelo.exceptions.*;
+
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -23,6 +27,7 @@ public class Datos {
             // coge lo que sea que haya petado!
             cargarClientesPrueba();
             cargarHotelesPrueba();
+            cargarHabitacionesPrueba();
         } catch (Exception e) {
             System.err.println("Error cargando datos de prueba: " + e.getMessage());
         }
@@ -180,7 +185,7 @@ public class Datos {
         List<Habitacion> listaDisponibles = new ArrayList<>();
 
 
-        for (Habitacion habitacion : hotel.getHabitaciones()) {
+        for (Habitacion habitacion : hotel.getHabitaciones().getArrayList()) {
             if (estaDisponible(habitacion, entrada, salida)) {
                 listaDisponibles.add(habitacion);
             }
@@ -196,7 +201,7 @@ public class Datos {
         Hotel hotel = buscarHotelPorId(hotelId);
         List<Habitacion> habitacionesCategoria = new ArrayList<>();
 
-        for (Habitacion h : hotel.getHabitaciones()) {
+        for (Habitacion h : hotel.getHabitaciones().getArrayList()) {
             if (h.getCategoria() == categoria) {
                 habitacionesCategoria.add(h);
             }
@@ -233,17 +238,16 @@ public class Datos {
         addHotel(h2);
         addHotel(h3);
 
-        // Añade habitaciones de ejemplo (ajusta los constructores si los tuyos son distintos)
-        h1.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 85.0));
-        h1.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 120.0));
-        h1.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
+    }
 
-        h2.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 75.0));
-        h2.agregarHabitacion(new HabitacionEstandar(102, "102", "1", 2, 75.0));
-        h2.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 3, 110.0));
-
-        h3.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 80.0));
-        h3.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 115.0));
-        h3.agregarHabitacion(new Suite(301, "301", "3", 4, 170.0));
+    public void cargarHabitacionesPrueba() {
+        for (int i = 1; i<=hoteles.size(); i++) {
+            Hotel hotel = hoteles.get(i);
+            hotel.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 85.0));
+            hotel.agregarHabitacion(new HabitacionEstandar(102, "102", "1", 3, 115.0));
+            hotel.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 120.0));
+            hotel.agregarHabitacion(new HabitacionSuperior(202, "202", "2", 3, 145.0));
+            hotel.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
+        }
     }
 }

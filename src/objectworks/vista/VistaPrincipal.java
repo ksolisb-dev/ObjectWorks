@@ -3,6 +3,11 @@ package objectworks.vista;
 import java.util.Scanner;
 import objectworks.controlador.Controlador;
 import objectworks.modelo.*;
+import objectworks.modelo.enums.CategoriaHabitacion;
+import objectworks.modelo.exceptions.DatoObligatorioException;
+import objectworks.modelo.exceptions.FechasInvalidasException;
+import objectworks.modelo.exceptions.HotelNoEncontradoException;
+
 import java.time.LocalDate;
 import java.util.List;
 

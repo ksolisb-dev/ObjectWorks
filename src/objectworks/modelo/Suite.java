@@ -1,5 +1,7 @@
 package objectworks.modelo;
 
+import objectworks.modelo.enums.CategoriaHabitacion;
+
 public class Suite extends Habitacion {
 
     private double precioBaseNoche;
