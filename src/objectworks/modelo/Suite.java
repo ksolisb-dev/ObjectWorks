@@ -26,9 +26,8 @@ public class Suite extends Habitacion {
     }
 
     @Override
-    public double calcularPrecioNoche(){
-        //TODO
-        return 0;
+    public double calcularPrecioNoche() {
+        return precioBaseNoche * 2;
     }
 
     public double getPrecioBaseNoche() {
