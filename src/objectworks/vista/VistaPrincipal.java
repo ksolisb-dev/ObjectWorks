@@ -38,7 +38,7 @@ public class VistaPrincipal {
             } else if (opcion.equals("3")) {
                 new GestionHabitacionesVista(controlador, teclado).menu();
             } else if (opcion.equals("4")) {
-                System.out.println("Pendiente (Parte 4)");
+                new GestionReservasVista(controlador, teclado).menu();
             } else if (opcion.equals("5")) {
                 new GestionConsultasVista(controlador, teclado).menu();
             } else if (opcion.equals("0")) {
