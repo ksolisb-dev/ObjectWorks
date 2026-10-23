@@ -96,4 +96,55 @@ public class Controlador {
 
     // ===================== RESERVAS =====================
 
+    public Lista<Reserva> listarReservas() {
+        return datos.listarReservas();
+    }
+
+    public Reserva buscarReservaPorId(int idReserva)
+            throws ReservaNoEncontradaException, DatoInvalidoException {
+
+        return datos.buscarReservaPorId(idReserva);
+    }
+
+    public Reserva crearReserva(String dniCliente, int hotelId, LocalDate entrada, LocalDate salida, int numPersonas, Lista<Habitacion> habitacionesSeleccionadas)
+                throws ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, DatoObligatorioException, DatoInvalidoException, HabitacionOcupadaException {
+
+        return datos.crearReserva(dniCliente, hotelId, entrada, salida, numPersonas, habitacionesSeleccionadas);
+    }
+
+    public Reserva modificarReserva(int idReserva, LocalDate nuevaEntrada, LocalDate nuevaSalida, int nuevoNumPersonas, Lista<Habitacion> nuevasHabitaciones)
+                throws ReservaNoEncontradaException, FechasInvalidasException, DatoObligatorioException, HabitacionOcupadaException {
+
+        return datos.modificarReserva(idReserva, nuevaEntrada, nuevaSalida, nuevoNumPersonas, nuevasHabitaciones);
+    }
+
+    public void cancelarReserva(int idReserva)
+                throws ReservaNoEncontradaException, DatoInvalidoException {
+
+        datos.cancelarReserva(idReserva);
+    }
+
+    // Lista todas las reservas que pueden ser modificadas al usuario
+    public Lista<Habitacion> habitacionesDisponiblesParaModificar(int idReserva, LocalDate entrada, LocalDate salida)
+                throws ReservaNoEncontradaException, DatoInvalidoException, FechasInvalidasException {
+
+        // Validamos las fechas de entrada y salida
+        Validador.validarFechas(entrada, salida);
+
+        // Guardamos las reservas y creamos la nueva lista con las reservas disponibles
+        Reserva reserva = datos.buscarReservaPorId(idReserva);
+        Lista<Habitacion> disponibles = new Lista<>();
+
+        // Llenamos la lista con las reservas modificables
+        for (Habitacion habitacion
+                : reserva.getHotel().getHabitaciones().getArrayList()) {
+
+            if (datos.estaDisponible(
+                    habitacion, entrada, salida, reserva)) {
+                disponibles.add(habitacion);
+            }
+        }
+
+        return disponibles;
+    }
 }
