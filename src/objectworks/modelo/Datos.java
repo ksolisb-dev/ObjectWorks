@@ -26,6 +26,7 @@ public class Datos {
             cargarClientesPrueba();
             cargarHotelesPrueba();
             cargarHabitacionesPrueba();
+            cargarReservasPrueba();
         } catch (Exception e) {
             System.err.println("Error cargando datos de prueba: " + e.getMessage());
         }
@@ -153,26 +154,6 @@ public class Datos {
         return hotel;
     }
 
-    // Funcion que comprueba si dada una habitación y un rango de fechas está disponible.
-    // PD: Podría dejarla en private pero por si acaso os la dejo public aunque en teoria solo la usará este codigo.
-    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
-
-        for (Reserva r : reservas.values()) {
-            if (r.getEstado() == EstadoReserva.CANCELADA) {
-                continue;
-            }
-
-
-            if (r.getHabitaciones() != null && r.getHabitaciones().contains(habitacion)) {
-                // Hay solapamiento de fechas!!
-                if (entrada.isBefore(r.getFechaSalida()) && salida.isAfter(r.getFechaEntrada())) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public Lista<Habitacion> getHabitacionesHotel(int hotelId) throws HotelNoEncontradoException{
         Hotel hotel = buscarHotelPorId(hotelId);
         return hotel.getHabitaciones();
@@ -241,6 +222,188 @@ public class Datos {
         return resultado;
     }
 
+    // ===================== RESERVAS =====================
+
+    // Comprueba la disponibilidad de una habitación por fechas, sin tener en cuenta ninguna reserva concreta (para crear una nueva reserva)
+    // Esta va a retornar su misma función pero con null como reserva a ignorar, para no tener que duplicar código
+    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
+
+        return estaDisponible(habitacion, entrada, salida, null);
+    }
+
+    // Sobrecarga de la función anterior, para poder ignorar una reserva concreta (para modificar una reserva existente)
+    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida, Reserva reservaIgnorada) {
+
+        for (Reserva r : reservas.values()) {
+
+            // Si la reserva está cancelada, no nos importa, podemos reservar la habitación igualmente
+            // Esto va a funcionar ahora si la reserva que estamos ignorando es la misma de nuestra colección en Datos, si creamos un nuevo objeto con el mismo id no va a funcionar, pero para lo que tenemos ahora mismo es suficiente
+            if (r == reservaIgnorada || r.getEstado() == EstadoReserva.CANCELADA) {
+                continue;
+            }
+
+            if (r.getHabitaciones() != null && r.getHabitaciones().contains(habitacion)) {
+                // Hay solapamiento de fechas!!
+                if (entrada.isBefore(r.getFechaSalida()) && salida.isAfter(r.getFechaEntrada())) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    // Crear reserva con todas las validaciones necesarias
+    public Reserva crearReserva(String dniCliente, int hotelId, LocalDate entrada, LocalDate salida, int numPersonas, Lista<Habitacion> habitacionesSeleccionadas)
+            throws DatoObligatorioException, ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, HabitacionOcupadaException {
+
+        // Validamos fechas y numero de personas
+        // Obtener cliente y hotel
+        Validador.validarNumeroPersonas(numPersonas);
+        Validador.validarFechas(entrada, salida);
+        Cliente cliente = getCliente(dniCliente);
+        Hotel hotel = buscarHotelPorId(hotelId);
+
+        // Comprobamos que se ha seleccionado al menos una habitación
+        if (habitacionesSeleccionadas == null || habitacionesSeleccionadas.isEmpty()) {
+            throw new HabitacionOcupadaException("Debe seleccionar al menos una habitación para la reserva.");
+        }
+
+        int totalCapacidad = 0;
+        Lista<Habitacion> habitacionesComprobadas = new Lista<>(); // Lista para almacenar habitaciones válidas y evitar duplicados
+
+        // Revisamos las habitaciones seleccionadas
+        for (Habitacion habitacion : habitacionesSeleccionadas.getArrayList()) {
+            if (habitacion == null) { // Comprobamos si la habitación es nula
+                throw new HabitacionOcupadaException("Se ha seleccionado una habitación nula.");
+            }
+
+            if (!hotel.getHabitaciones().contains(habitacion)) { // Comprobamos si la habitación pertenece al hotel
+                throw new HabitacionOcupadaException("La habitación " + habitacion.getNumero() + " no pertenece al hotel seleccionado.");
+            }
+
+            if (!estaDisponible(habitacion, entrada, salida)) { // Comprobamos disponibilidad
+                throw new HabitacionOcupadaException("La habitación " + habitacion.getNumero() + " no está disponible en las fechas seleccionadas.");
+            }
+
+            habitacionesComprobadas.add(habitacion); // Añadimos la habitación a la lista de habitaciones válidas
+            totalCapacidad += habitacion.getCapacidad(); // Sumamos la capacidad de la habitación
+
+        }
+
+        // Comprobamos que la capacidad total de las habitaciones seleccionadas es suficiente para el número de personas
+        if (numPersonas > totalCapacidad) {
+            throw new HabitacionOcupadaException("La capacidad total de las habitaciones seleccionadas (" + totalCapacidad + ") no es suficiente para el número de personas (" + numPersonas + ").");
+        }
+
+        // Buscamos un id único para la reserva
+        int idReserva = 1;
+
+        while (reservas.containsKey(idReserva)) {
+            idReserva++;
+        }
+
+        // Creamos la reserva
+        Reserva nuevaReserva = new Reserva(idReserva, entrada, salida, numPersonas, LocalDate.now(), EstadoReserva.CONFIRMADA, hotel, cliente, habitacionesComprobadas);
+        
+        // Guardamos la reserva en el mapa de reservas después de validar todo
+        reservas.put(idReserva, nuevaReserva);
+
+        return nuevaReserva;
+    }
+
+    // Busca una reserva por su id, lanza excepción si no existe
+    public Reserva buscarReservaPorId(int idReserva)
+            throws ReservaNoEncontradaException {
+
+        Reserva reserva = reservas.get(idReserva);
+        
+        if (reserva == null) {
+            throw new ReservaNoEncontradaException("No existe ninguna reserva con id " + idReserva);
+        }
+
+        return reserva;
+    }
+
+    // Cancelar una reserva por Id
+    public void cancelarReserva(int idReserva)
+            throws ReservaNoEncontradaException {
+        
+        Reserva reserva = buscarReservaPorId(idReserva);
+        reserva.cancelar();
+    }
+
+    // Lista todas las reservas
+    public Lista<Reserva> listarReservas() {
+        Lista<Reserva> lista = new Lista<>(reservas.values());
+
+        lista.sort(Comparator.comparing(Reserva::getId));
+
+        return lista;
+    }
+
+    // Modificar una reserva existente, con todas las validaciones necesarias
+    public Reserva modificarReserva(int idReserva, LocalDate nuevaEntrada, LocalDate nuevaSalida, int nuevoNumPersonas, Lista<Habitacion> nuevasHabitaciones)
+            throws DatoObligatorioException, ReservaNoEncontradaException, FechasInvalidasException, HabitacionOcupadaException {
+
+        // Buscamos la reserva a modificar
+        Reserva reserva = buscarReservaPorId(idReserva);
+        Hotel hotel = reserva.getHotel();
+
+        // Validamos fechas y numero de personas
+        Validador.validarFechas(nuevaEntrada, nuevaSalida);
+        Validador.validarNumeroPersonas(nuevoNumPersonas);
+
+        // Comprobamos que se ha seleccionado al menos una habitación
+        if (nuevasHabitaciones == null || nuevasHabitaciones.isEmpty()) {
+            throw new HabitacionOcupadaException("Debe seleccionar al menos una habitación para la reserva.");
+        }
+
+        int totalCapacidad = 0;
+        Lista<Habitacion> habitacionesComprobadas = new Lista<>(); // Lista para almacenar habitaciones válidas y evitar duplicados
+
+        // Revisamos las habitaciones seleccionadas
+        for (Habitacion habitacion : nuevasHabitaciones.getArrayList()) {
+            if (habitacion == null) { // Comprobamos si la habitación es nula
+                throw new HabitacionOcupadaException("Se ha seleccionado una habitación nula.");
+            }
+
+            if (!hotel.getHabitaciones().contains(habitacion)) { // Comprobamos si la habitación pertenece al hotel
+                throw new HabitacionOcupadaException("La habitación " + habitacion.getNumero() + " no pertenece al hotel de la reserva.");
+            }
+
+            if (habitacionesComprobadas.contains(habitacion)) { //
+                throw new HabitacionOcupadaException("La habitación " + habitacion.getNumero() + " está repetida en la selección.");
+            }
+
+            if (!estaDisponible(habitacion, nuevaEntrada, nuevaSalida, reserva)) { // Comprobamos disponibilidad ignorando la reserva actual
+                throw new HabitacionOcupadaException("La habitación " + habitacion.getNumero() + " no está disponible en las fechas seleccionadas.");
+            }
+
+            habitacionesComprobadas.add(habitacion); // Añadimos la habitación a la lista de habitaciones válidas
+            totalCapacidad += habitacion.getCapacidad(); // Sumamos la capacidad de la habitación
+        }
+
+        // Comprobamos que la capacidad total de las habitaciones seleccionadas es suficiente para el número de personas
+        if (nuevoNumPersonas > totalCapacidad) {
+            throw new HabitacionOcupadaException("La capacidad total de las habitaciones seleccionadas (" + totalCapacidad + ") no es suficiente para el número de personas (" + nuevoNumPersonas + ").");
+        }
+
+        // Si es correcto, actualizamos la reserva
+        reserva.setFechaEntrada(nuevaEntrada);
+        reserva.setFechaSalida(nuevaSalida);
+        reserva.setNumPersonas(nuevoNumPersonas);
+
+        reserva.getHabitaciones().clear();
+        reserva.getHabitaciones().addAll(habitacionesComprobadas);
+
+        // Recalculamos el importe de la reserva después de modificarla
+        reserva.recalcularImporte();
+
+        return reserva;
+
+    }
+            
+
     // ===================== DATOS DE PRUEBA =====================
 
 
@@ -273,4 +436,29 @@ public class Datos {
             hotel.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
         }
     }
+
+    // Reservas de prueba
+    private void cargarReservasPrueba()
+            throws DatoObligatorioException, ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, HabitacionOcupadaException {
+        
+        String[] dnis = {"11111111A", "22222222B", "33333333C", "44444444D", "55555555E"};
+
+        int[] idHoteles = {1, 2, 3, 1, 2};
+        int[] posicionesHabitaciones = {0, 1, 2, 3, 4}; // Posiciones de las habitaciones en la lista del hotel
+
+        LocalDate entrada = LocalDate.now().plusDays(10);
+        LocalDate salida = entrada.plusDays(3);
+
+        for (int i = 0; i < dnis.length; i++) {
+            Hotel hotel = buscarHotelPorId(idHoteles[i]);
+
+            Habitacion habitacion = hotel.getHabitaciones().getAt(posicionesHabitaciones[i]);
+
+            Lista<Habitacion> seleccion = new Lista<>();
+            seleccion.add(habitacion);
+
+            crearReserva(dnis[i], hotel.getId(), entrada, salida, 2, seleccion);
+        }
+    }
+    
 }

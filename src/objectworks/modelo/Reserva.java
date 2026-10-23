@@ -4,6 +4,8 @@ import objectworks.modelo.enums.EstadoReserva;
 
 import java.time.LocalDate;
 
+import java.time.temporal.ChronoUnit;
+
 public class Reserva {
     private int id;
     private LocalDate fechaEntrada;
@@ -35,6 +37,8 @@ public class Reserva {
         if (habitaciones != null) {
             this.habitaciones.addAll(habitaciones);
         }
+
+        this.importe = calcularImporte(); // Calculamos ahora el importe inicial de la reserva basado en las habitaciones y las fechas.
     }
 
     //Getters y setters
@@ -72,11 +76,12 @@ public class Reserva {
     }
 
     public double getImporte() {
-        return importe;
+        this.importe = calcularImporte();
+        return this.importe;
     }
 
-    public void setImporte(double importe) {
-        this.importe = importe;
+    public void recalcularImporte() {
+        this.importe = calcularImporte();
     }
 
     public LocalDate getFechaCreacion() {
@@ -118,24 +123,42 @@ public class Reserva {
     public void agregarHabitacion(Habitacion habitacion) {
         if (habitacion != null && !habitaciones.contains(habitacion)) {
             habitaciones.add(habitacion);
-            importe = calcularImporte();
+            this.importe = calcularImporte();
         }
     }
 
     //Funciones
-
+    
+    // Validar que las fechas no sean nulas y que la fecha de salida sea posterior a la fecha de entrada
+    // La diferencia entre entrada y salida representa el número de noches de la reserva
     public int calcularNoches() {
-        //TODO
-        return 0;
+        if (fechaEntrada == null || fechaSalida == null) {
+            throw new IllegalStateException("Las fechas de entrada y salida deben estar definidas.");
+        }
+
+        if (!fechaSalida.isAfter(fechaEntrada)) {
+            throw new IllegalArgumentException("La fecha de salida debe ser posterior a la fecha de entrada.");
+        }
+
+        return Math.toIntExact(ChronoUnit.DAYS.between(fechaEntrada, fechaSalida));
     }
 
+    // Calcula el precio total de una reserva con n_noches * precio_por_noche de cada habitación.
     public double calcularImporte() {
-        //TODO
-        return 0;
+        int noches = calcularNoches();
+        double precioTotalPorNoche = 0.0;
+
+        for (int i = 0; i < habitaciones.size(); i++) {
+            Habitacion habitacion = habitaciones.getAt(i);
+            precioTotalPorNoche += habitacion.calcularPrecioNoche();
+        }
+
+        return precioTotalPorNoche * noches;
     }
 
+    // Cambia el estado de la reserva a CANCELADA, de momento tiene sentido.
     public void cancelar() {
-        //TODO
+        this.estado = EstadoReserva.CANCELADA;
     }
 
     @Override
@@ -145,7 +168,7 @@ public class Reserva {
                 ", fechaEntrada=" + fechaEntrada +
                 ", fechaSalida=" + fechaSalida +
                 ", numPersonas=" + numPersonas +
-                ", importe=" + importe +
+                ", importe=" + getImporte() +
                 ", fechaCreacion=" + fechaCreacion +
                 ", estado=" + estado +
                 ", hotelId=" + (hotel != null ? hotel.getId() : null) +
