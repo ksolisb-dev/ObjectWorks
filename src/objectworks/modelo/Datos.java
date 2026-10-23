@@ -153,26 +153,6 @@ public class Datos {
         return hotel;
     }
 
-    // Funcion que comprueba si dada una habitación y un rango de fechas está disponible.
-    // PD: Podría dejarla en private pero por si acaso os la dejo public aunque en teoria solo la usará este codigo.
-    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
-
-        for (Reserva r : reservas.values()) {
-            if (r.getEstado() == EstadoReserva.CANCELADA) {
-                continue;
-            }
-
-
-            if (r.getHabitaciones() != null && r.getHabitaciones().contains(habitacion)) {
-                // Hay solapamiento de fechas!!
-                if (entrada.isBefore(r.getFechaSalida()) && salida.isAfter(r.getFechaEntrada())) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public Lista<Habitacion> getHabitacionesHotel(int hotelId) throws HotelNoEncontradoException{
         Hotel hotel = buscarHotelPorId(hotelId);
         return hotel.getHabitaciones();
@@ -239,6 +219,36 @@ public class Datos {
         }
 
         return resultado;
+    }
+
+    // ===================== RESERVAS =====================
+
+    // Comprueba la disponibilidad de una habitación por fechas, sin tener en cuenta ninguna reserva concreta (para crear una nueva reserva)
+    // Esta va a retornar su misma función pero con null como reserva a ignorar, para no tener que duplicar código
+    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
+
+        return estaDisponible(habitacion, entrada, salida, null);
+    }
+
+    // Sobrecarga de la función anterior, para poder ignorar una reserva concreta (para modificar una reserva existente)
+    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida, Reserva reservaIgnorada) {
+
+        for (Reserva r : reservas.values()) {
+
+            // Si la reserva está cancelada, no nos importa, podemos reservar la habitación igualmente
+            // Esto va a funcionar ahora si la reserva que estamos ignorando es la misma de nuestra colección en Datos, si creamos un nuevo objeto con el mismo id no va a funcionar, pero para lo que tenemos ahora mismo es suficiente
+            if (r == reservaIgnorada || r.getEstado() == EstadoReserva.CANCELADA) {
+                continue;
+            }
+
+            if (r.getHabitaciones() != null && r.getHabitaciones().contains(habitacion)) {
+                // Hay solapamiento de fechas!!
+                if (entrada.isBefore(r.getFechaSalida()) && salida.isAfter(r.getFechaEntrada())) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     // ===================== DATOS DE PRUEBA =====================
