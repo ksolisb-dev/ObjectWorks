@@ -80,6 +80,10 @@ public class Reserva {
         return this.importe;
     }
 
+    public void recalcularImporte() {
+        this.importe = calcularImporte();
+    }
+
     public LocalDate getFechaCreacion() {
         return fechaCreacion;
     }

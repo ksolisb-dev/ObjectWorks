@@ -340,6 +340,68 @@ public class Datos {
         return lista;
     }
 
+    // Modificar una reserva existente, con todas las validaciones necesarias
+    public Reserva modificarReserva(int idReserva, LocalDate nuevaEntrada, LocalDate nuevaSalida, int nuevoNumPersonas, Lista<Habitacion> nuevasHabitaciones)
+            throws ReservaNoEncontradaException, FechasInvalidasException, HabitacionNoDisponibleException {
+
+        // Buscamos la reserva a modificar
+        Reserva reserva = buscarReservaPorId(idReserva);
+        Hotel hotel = reserva.getHotel();
+
+        // Validamos fechas y numero de personas
+        Validador.validarFechas(nuevaEntrada, nuevaSalida);
+        Validador.validarNumeroPersonas(nuevoNumPersonas);
+
+        // Comprobamos que se ha seleccionado al menos una habitación
+        if (nuevasHabitaciones == null || nuevasHabitaciones.isEmpty()) {
+            throw new HabitacionNoDisponibleException("Debe seleccionar al menos una habitación para la reserva.");
+        }
+
+        int totalCapacidad = 0;
+        Lista<Habitacion> habitacionesComprobadas = new Lista<>(); // Lista para almacenar habitaciones válidas y evitar duplicados
+
+        // Revisamos las habitaciones seleccionadas
+        for (Habitacion habitacion : nuevasHabitaciones.getArrayList()) {
+            if (habitacion == null) { // Comprobamos si la habitación es nula
+                throw new HabitacionNoDisponibleException("Se ha seleccionado una habitación nula.");
+            }
+
+            if (!hotel.getHabitaciones().contains(habitacion)) { // Comprobamos si la habitación pertenece al hotel
+                throw new HabitacionNoDisponibleException("La habitación " + habitacion.getNumero() + " no pertenece al hotel de la reserva.");
+            }
+
+            if (!habitacionesComprobadas.contains(habitacion)) { //
+                throw new HabitacionNoDisponibleException("La habitación " + habitacion.getNumero() + " está repetida en la selección.");
+            }
+
+            if (!estaDisponible(habitacion, nuevaEntrada, nuevaSalida, reserva)) { // Comprobamos disponibilidad ignorando la reserva actual
+                throw new HabitacionNoDisponibleException("La habitación " + habitacion.getNumero() + " no está disponible en las fechas seleccionadas.");
+            }
+
+            habitacionesComprobadas.add(habitacion); // Añadimos la habitación a la lista de habitaciones válidas
+            totalCapacidad += habitacion.getCapacidad(); // Sumamos la capacidad de la habitación
+        }
+
+        // Comprobamos que la capacidad total de las habitaciones seleccionadas es suficiente para el número de personas
+        if (nuevoNumPersonas > totalCapacidad) {
+            throw new HabitacionNoDisponibleException("La capacidad total de las habitaciones seleccionadas (" + totalCapacidad + ") no es suficiente para el número de personas (" + nuevoNumPersonas + ").");
+        }
+
+        // Si todo es correcto, actualizamos la reserva
+        reserva.setFechaEntrada(nuevaEntrada);
+        reserva.setFechaSalida(nuevaSalida);
+        reserva.setNumPersonas(nuevoNumPersonas);
+
+        reserva.getHabitaciones().clear();
+        reserva.getHabitaciones().addAll(habitacionesComprobadas);
+
+        // Recalculamos el importe de la reserva después de modificarla
+        reserva.recalcularImporte();
+
+        return reserva;
+
+    }
+            
 
     // ===================== DATOS DE PRUEBA =====================
 
