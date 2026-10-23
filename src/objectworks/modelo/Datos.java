@@ -371,7 +371,7 @@ public class Datos {
                 throw new HabitacionOcupadaException("La habitación " + habitacion.getNumero() + " no pertenece al hotel de la reserva.");
             }
 
-            if (!habitacionesComprobadas.contains(habitacion)) { //
+            if (habitacionesComprobadas.contains(habitacion)) { //
                 throw new HabitacionOcupadaException("La habitación " + habitacion.getNumero() + " está repetida en la selección.");
             }
 
