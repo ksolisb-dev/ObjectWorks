@@ -26,6 +26,7 @@ public class Datos {
             cargarClientesPrueba();
             cargarHotelesPrueba();
             cargarHabitacionesPrueba();
+            cargarReservasPrueba();
         } catch (Exception e) {
             System.err.println("Error cargando datos de prueba: " + e.getMessage());
         }
@@ -435,4 +436,29 @@ public class Datos {
             hotel.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
         }
     }
+
+    // Reservas de prueba
+    private void cargarReservasPrueba() {
+            throws ReservaNoEncontradaException, ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, HabitacionNoDisponibleException {
+        
+        String[] dnis = {"11111111A", "22222222B", "33333333C", "44444444D", "55555555E"};
+
+        int[] idHoteles = {1, 2, 3, 1, 2};
+        int[] posicionesHabitaciones = {0, 1, 2, 3, 4}; // Posiciones de las habitaciones en la lista del hotel
+
+        LocalDate entrada = LocalDate.now().plusDays(10);
+        LocalDate salida = entrada.plusDays(3);
+
+        for (int i = 0; i < dnis.length; i++) {
+            Hotel hotel = buscarHotelPorId(idsHoteles[i]);
+
+            Habitacion habitacion = hotel.getHabitaciones().getAt(posicionesHabitaciones[i]);
+
+            Lista<Habitacion> seleccion = new Lista<>();
+            seleccion.add(habitacion);
+
+            crearReserva(dnis[i], hotel.getId(), entrada, salida, 2, seleccion);
+        }
+    }
+    
 }
