@@ -310,7 +310,36 @@ public class Datos {
         return nuevaReserva;
     }
 
-    
+    // Busca una reserva por su id, lanza excepción si no existe
+    public Reserva buscarReservaPorId(int idReserva)
+            throws ReservaNoEncontradaException {
+
+        Reserva reserva = reservas.get(idReserva);
+        
+        if (reserva == null) {
+            throw new ReservaNoEncontradaException("No existe ninguna reserva con id " + idReserva);
+        }
+
+        return reserva;
+    }
+
+    // Cancelar una reserva por Id
+    public void cancelarReserva(int idReserva)
+            throws ReservaNoEncontradaException {
+        
+        Reserva reserva = buscarReservaPorId(idReserva);
+        reserva.cancelar();
+    }
+
+    // Lista todas las reservas
+    public Lista<Reserva> listarReservas() {
+        Lista<Reserva> lista = new Lista<>(reservas.values());
+
+        lista.sort(Comparator.comparing(Reserva::getId));
+
+        return lista;
+    }
+
 
     // ===================== DATOS DE PRUEBA =====================
 
