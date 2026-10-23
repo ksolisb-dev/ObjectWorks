@@ -251,6 +251,67 @@ public class Datos {
         return true;
     }
 
+    // Crear reserva con todas las validaciones necesarias
+    public Reserva crearReserva(String dniCliente, int hotelId, LocalDate entrada, LocalDate salida, int numPersonas, Lista<Habitacion> habitacionesSeleccionadas)
+            throws ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, HabitacionNoDisponibleException {
+
+        // Validamos fechas y numero de personas
+        // Obtener cliente y hotel
+        Validador.validarNumeroPersonas(numPersonas);
+        Validador.validarFechas(entrada, salida);
+        Cliente cliente = getCliente(dniCliente);
+        Hotel hotel = buscarHotelPorId(hotelId);
+
+        // Comprobamos que se ha seleccionado al menos una habitación
+        if (habitacionesSeleccionadas == null || habitacionesSeleccionadas.isEmpty()) {
+            throw new HabitacionNoDisponibleException("Debe seleccionar al menos una habitación para la reserva.");
+        }
+
+        int totalCapacidad = 0;
+        Lista<Habitacion> habitacionesComprobadas = new Lista<>(); // Lista para almacenar habitaciones válidas y evitar duplicados
+
+        // Revisamos las habitaciones seleccionadas
+        for (Habitacion habitacion : habitacionesSeleccionadas.getArrayList()) {
+            if (habitacion == null) { // Comprobamos si la habitación es nula
+                throw new HabitacionNoDisponibleException("Se ha seleccionado una habitación nula.");
+            }
+
+            if (!hotel.getHabitaciones().contains(habitacion)) { // Comprobamos si la habitación pertenece al hotel
+                throw new HabitacionNoDisponibleException("La habitación " + habitacion.getNumero() + " no pertenece al hotel seleccionado.");
+            }
+
+            if (!estaDisponible(habitacion, entrada, salida)) { // Comprobamos disponibilidad
+                throw new HabitacionNoDisponibleException("La habitación " + habitacion.getNumero() + " no está disponible en las fechas seleccionadas.");
+            }
+
+            habitacionesComprobadas.add(habitacion); // Añadimos la habitación a la lista de habitaciones válidas
+            totalCapacidad += habitacion.getCapacidad(); // Sumamos la capacidad de la habitación
+
+        }
+
+        // Comprobamos que la capacidad total de las habitaciones seleccionadas es suficiente para el número de personas
+        if (numPersonas > totalCapacidad) {
+            throw new HabitacionNoDisponibleException("La capacidad total de las habitaciones seleccionadas (" + totalCapacidad + ") no es suficiente para el número de personas (" + numPersonas + ").");
+        }
+
+        // Buscamos un id único para la reserva
+        int idReserva = 1;
+
+        while (reservas.containsKey(idReserva)) {
+            idReserva++;
+        }
+
+        // Creamos la reserva
+        Reserva nuevaReserva = new Reserva(idReserva, entrada, salida, numPersonas, LocalDate.now(), EstadoReserva.CONFIRMADA, hotel, cliente, habitacionesComprobadas);
+        
+        // Guardamos la reserva en el mapa de reservas después de validar todo
+        reservas.put(idReserva, nuevaReserva);
+
+        return nuevaReserva;
+    }
+
+    
+
     // ===================== DATOS DE PRUEBA =====================
 
 
