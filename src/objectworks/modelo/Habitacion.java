@@ -7,6 +7,8 @@ public abstract class Habitacion {
     private String numero;
     private String planta;
     private int capacidad;
+    protected double precioBaseNoche; // Si no le pongo protected no me lo deja usar
+    // Como es un cambio de ultima hora no estoy muy seguro si esto iba aquí, pero juraría que si
 
     public Habitacion(int id, String nombre, String planta,
                       int capacidad) {
@@ -30,7 +32,7 @@ public abstract class Habitacion {
         return numero;
     }
 
-    public void getNumero(String numero) {
+    public void setNumero(String numero) {
         this.numero = numero;
     }
 
@@ -54,9 +56,17 @@ public abstract class Habitacion {
 
     public abstract CategoriaHabitacion getCategoria();
 
-    public abstract double calcularPrecioNoche();
+    public double getPrecioBaseNoche() {
+        return precioBaseNoche;
+    }
 
-    public abstract double getPrecioBaseNoche();
+    public void setPrecioBaseNoche(double precioBaseNoche) {
+        this.precioBaseNoche = precioBaseNoche;
+    }
+
+    public double calcularPrecioNoche() {
+        return precioBaseNoche;
+    }
 
     @Override
     public String toString() {

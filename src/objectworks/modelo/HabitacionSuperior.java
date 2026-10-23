@@ -26,9 +26,8 @@ public class HabitacionSuperior extends Habitacion {
     }
 
     @Override
-    public double calcularPrecioNoche(){
-        //TODO
-        return 0;
+    public double calcularPrecioNoche() {
+        return precioBaseNoche * 1.5;
     }
 
     public double getPrecioBaseNoche() {
@@ -41,4 +40,5 @@ public class HabitacionSuperior extends Habitacion {
                 super.toString() +
                 '}';
     }
+
 }
