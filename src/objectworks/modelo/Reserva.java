@@ -150,7 +150,7 @@ public class Reserva {
 
         for (int i = 0; i < habitaciones.size(); i++) {
             Habitacion habitacion = habitaciones.getAt(i);
-            precioTotalPorNoche += habitacion.calcularPrecioPorNoche();
+            precioTotalPorNoche += habitacion.calcularPrecioPorNoche(); // arreglar función calcularPrecioPorNoche de clase habitación
         }
 
         return precioTotalPorNoche * noches;
