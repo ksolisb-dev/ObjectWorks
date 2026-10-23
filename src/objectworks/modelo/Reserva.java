@@ -128,7 +128,7 @@ public class Reserva {
     }
 
     //Funciones
-    
+
     // Validar que las fechas no sean nulas y que la fecha de salida sea posterior a la fecha de entrada
     // La diferencia entre entrada y salida representa el número de noches de la reserva
     public int calcularNoches() {

@@ -1,7 +1,7 @@
 package objectworks.vista;
 
 import objectworks.controlador.Controlador;
-import objectworks.modelo.Lista;
+import objectworks.modelo.*;
 import objectworks.modelo.enums.EstadoReserva;
 import objectworks.modelo.Reserva;
 import java.time.LocalDate;
@@ -59,9 +59,10 @@ public class GestionConsultasVista {
             System.out.println("No existen reservas con esos datos.");
         } else {
             System.out.println("Resultados encontrados: ");
-            //TODO: SE NECESITAN DEPENDENCIAS DE LA PARTE 4 - RESERVAS
-            // Se necesita un toString para mostrar correctamente la información para compilar
-            //for (Reserva reserva : lista) System.out.println(reserva.toString());
+            for (int i = 0; i < lista.size(); i++) {
+                Reserva reserva = lista.getAt(i);
+                System.out.println(reserva.toString());
+            }
         }
     }
 
@@ -72,7 +73,7 @@ public class GestionConsultasVista {
 
     private void buscarPorHotel() {
         int id = Integer.parseInt(pedir("Id del hotel: "));
-        mostrarLista(controlador.buscarReservassPorHotel(id));
+        mostrarLista(controlador.buscarReservasPorHotel(id));
     }
 
     private void buscarPorFechaEntrada() {
@@ -90,7 +91,8 @@ public class GestionConsultasVista {
         System.out.println("1. CONFIRMADA");
         System.out.println("2. CANCELADA");
         System.out.println("3. FINALIZADA");
-        int opcionEstado = Integer.parseInt("Elige el estado: ");
+
+        int opcionEstado = Integer.parseInt(pedir("Elige el estado: "));
 
         if (opcionEstado < 1 || opcionEstado > EstadoReserva.values().length) {
             System.out.println("Estado no valido");

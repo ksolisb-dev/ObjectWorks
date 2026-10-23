@@ -3,8 +3,7 @@ package objectworks.modelo;
 import objectworks.modelo.enums.CategoriaHabitacion;
 import objectworks.modelo.enums.EstadoReserva;
 import objectworks.modelo.exceptions.*;
-import java.sql.Array;
-import java.util.ArrayList;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -27,8 +26,7 @@ public class Datos {
             cargarClientesPrueba();
             cargarHotelesPrueba();
             cargarHabitacionesPrueba();
-            cargarReservasPrueba();
-        } catch (Exception e) {
+         } catch (Exception e) {
             System.err.println("Error cargando datos de prueba: " + e.getMessage());
         }
     }
@@ -155,26 +153,6 @@ public class Datos {
         return hotel;
     }
 
-    // Funcion que comprueba si dada una habitación y un rango de fechas está disponible.
-    // PD: Podría dejarla en private, pero por si acaso os la dejo public aunque en teoría solo la usará este código.
-    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
-
-        for (Reserva r : reservas.values()) {
-            if (r.getEstado() == EstadoReserva.CANCELADA) {
-                continue;
-            }
-
-
-            if (r.getHabitaciones() != null && r.getHabitaciones().contains(habitacion)) {
-                // ¡¡Hay solapamiento de fechas!!
-                if (entrada.isBefore(r.getFechaSalida()) && salida.isAfter(r.getFechaEntrada())) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
     public Lista<Habitacion> getHabitacionesHotel(int hotelId) throws HotelNoEncontradoException{
         Hotel hotel = buscarHotelPorId(hotelId);
         return hotel.getHabitaciones();
@@ -247,6 +225,10 @@ public class Datos {
 
     // Comprueba la disponibilidad de una habitación por fechas, sin tener en cuenta ninguna reserva concreta (para crear una nueva reserva)
     // Esta va a retornar su misma función pero con null como reserva a ignorar, para no tener que duplicar código
+    public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
+
+        return estaDisponible(habitacion, entrada, salida, null);
+    }
 
     // Sobrecarga de la función anterior, para poder ignorar una reserva concreta (para modificar una reserva existente)
     public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida, Reserva reservaIgnorada) {
@@ -321,7 +303,7 @@ public class Datos {
 
         // Creamos la reserva
         Reserva nuevaReserva = new Reserva(idReserva, entrada, salida, numPersonas, LocalDate.now(), EstadoReserva.CONFIRMADA, hotel, cliente, habitacionesComprobadas);
-        
+
         // Guardamos la reserva en el mapa de reservas después de validar todo
         reservas.put(idReserva, nuevaReserva);
 
@@ -333,7 +315,7 @@ public class Datos {
             throws ReservaNoEncontradaException {
 
         Reserva reserva = reservas.get(idReserva);
-        
+
         if (reserva == null) {
             throw new ReservaNoEncontradaException("No existe ninguna reserva con id " + idReserva);
         }
@@ -344,7 +326,7 @@ public class Datos {
     // Cancelar una reserva por Id
     public void cancelarReserva(int idReserva)
             throws ReservaNoEncontradaException {
-        
+
         Reserva reserva = buscarReservaPorId(idReserva);
         reserva.cancelar();
     }
@@ -419,40 +401,6 @@ public class Datos {
         return reserva;
 
     }
-            
-
-    // ===================== DATOS DE PRUEBA =====================
-
-
-    private void cargarClientesPrueba() throws DatoInvalidoException, ClienteDuplicadoException {
-        clientes.put("11111111A", new Cliente("11111111A", "Ana", "Garcia Lopez", "ana@mail.com", "600111111"));
-        clientes.put("22222222B", new Cliente("22222222B", "Marc", "Puig Ferrer", "marc@mail.com", "600222222"));
-        clientes.put("33333333C", new Cliente("33333333C", "Laura", "Martin Ruiz", "laura@mail.com", "600333333"));
-        clientes.put("44444444D", new Cliente("44444444D", "Jordi", "Vidal Soler", "jordi@mail.com", "600444444"));
-        clientes.put("55555555E", new Cliente("55555555E", "Sara", "Lopez Navarro", "sara@mail.com", "600555555"));
-    }
-
-    public void cargarHotelesPrueba() throws DatoObligatorioException {
-        Hotel h1 = new Hotel(1, "Hotel QueSueño", "Barcelona", "Paseo de Gracia 1", 4, "931234567");
-        Hotel h2 = new Hotel(2, "Hotel Doritos", "Madrid", "Gran Vía 10", 3, "911234567");
-        Hotel h3 = new Hotel(3, "Hotel Cocacola del Mercadona", "Valencia", "Avenida del Puerto 5", 4, "961234567");
-
-        addHotel(h1);
-        addHotel(h2);
-        addHotel(h3);
-
-    }
-
-    public void cargarHabitacionesPrueba() {
-        for (int i = 1; i<=hoteles.size(); i++) {
-            Hotel hotel = hoteles.get(i);
-            hotel.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 85.0));
-            hotel.agregarHabitacion(new HabitacionEstandar(102, "102", "1", 3, 115.0));
-            hotel.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 120.0));
-            hotel.agregarHabitacion(new HabitacionSuperior(202, "202", "2", 3, 145.0));
-            hotel.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
-        }
-    }
 
     //------------------------PARTE 5: CONSULTA DE RESERVAS-------------------------
 
@@ -516,10 +464,43 @@ public class Datos {
         return ordenarReservas(resultado);
     }
 
+    // ===================== DATOS DE PRUEBA =====================
+
+
+    private void cargarClientesPrueba() throws DatoInvalidoException, ClienteDuplicadoException {
+        clientes.put("11111111A", new Cliente("11111111A", "Ana", "Garcia Lopez", "ana@mail.com", "600111111"));
+        clientes.put("22222222B", new Cliente("22222222B", "Marc", "Puig Ferrer", "marc@mail.com", "600222222"));
+        clientes.put("33333333C", new Cliente("33333333C", "Laura", "Martin Ruiz", "laura@mail.com", "600333333"));
+        clientes.put("44444444D", new Cliente("44444444D", "Jordi", "Vidal Soler", "jordi@mail.com", "600444444"));
+        clientes.put("55555555E", new Cliente("55555555E", "Sara", "Lopez Navarro", "sara@mail.com", "600555555"));
+    }
+
+    public void cargarHotelesPrueba() throws DatoObligatorioException {
+        Hotel h1 = new Hotel(1, "Hotel QueSueño", "Barcelona", "Paseo de Gracia 1", 4, "931234567");
+        Hotel h2 = new Hotel(2, "Hotel Doritos", "Madrid", "Gran Vía 10", 3, "911234567");
+        Hotel h3 = new Hotel(3, "Hotel Cocacola del Mercadona", "Valencia", "Avenida del Puerto 5", 4, "961234567");
+
+        addHotel(h1);
+        addHotel(h2);
+        addHotel(h3);
+
+    }
+
+    public void cargarHabitacionesPrueba() {
+        for (int i = 1; i<=hoteles.size(); i++) {
+            Hotel hotel = hoteles.get(i);
+            hotel.agregarHabitacion(new HabitacionEstandar(101, "101", "1", 2, 85.0));
+            hotel.agregarHabitacion(new HabitacionEstandar(102, "102", "1", 3, 115.0));
+            hotel.agregarHabitacion(new HabitacionSuperior(201, "201", "2", 2, 120.0));
+            hotel.agregarHabitacion(new HabitacionSuperior(202, "202", "2", 3, 145.0));
+            hotel.agregarHabitacion(new Suite(301, "301", "3", 4, 180.0));
+        }
+    }
+
     // Reservas de prueba
     private void cargarReservasPrueba()
             throws DatoObligatorioException, ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, HabitacionOcupadaException {
-        
+
         String[] dnis = {"11111111A", "22222222B", "33333333C", "44444444D", "55555555E"};
 
         int[] idHoteles = {1, 2, 3, 1, 2};
