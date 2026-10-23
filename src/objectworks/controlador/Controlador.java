@@ -94,4 +94,6 @@ public class Controlador {
         return datos.filtrarHabitacionesPorPersonas(hotelId, numPersonas);
     }
 
+    // ===================== RESERVAS =====================
+
 }
