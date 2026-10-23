@@ -21,7 +21,7 @@ public class Datos {
     public Datos() {
         clientes = new HashMap<>();
         try {
-            // Ir añadiendo aqui las cosas que quereis que cargue de prueba
+            // ¡Ir añadiendo aquí las cosas que queréis que cargue de prueba
             // Como le puse validador han de pasar por aquí así si peta el catch
             // coge lo que sea que haya petado!
             cargarClientesPrueba();
@@ -155,7 +155,7 @@ public class Datos {
     }
 
     // Funcion que comprueba si dada una habitación y un rango de fechas está disponible.
-    // PD: Podría dejarla en private pero por si acaso os la dejo public aunque en teoria solo la usará este codigo.
+    // PD: Podría dejarla en private, pero por si acaso os la dejo public aunque en teoría solo la usará este código.
     public boolean estaDisponible(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
 
         for (Reserva r : reservas.values()) {
@@ -165,7 +165,7 @@ public class Datos {
 
 
             if (r.getHabitaciones() != null && r.getHabitaciones().contains(habitacion)) {
-                // Hay solapamiento de fechas!!
+                // ¡¡Hay solapamiento de fechas!!
                 if (entrada.isBefore(r.getFechaSalida()) && salida.isAfter(r.getFechaEntrada())) {
                     return false;
                 }
@@ -198,7 +198,7 @@ public class Datos {
         return listaDisponibles;
     }
 
-    // Función clonada de la de arriba pero que itera por categorías sin tener en cuenta fechas
+    // Función clonada de la de arriba, pero que itera por categorías sin tener en cuenta fechas
     public Lista<Habitacion> getHabitacionesPorCategoria(int hotelId, CategoriaHabitacion categoria)
             throws HotelNoEncontradoException {
 
@@ -214,7 +214,7 @@ public class Datos {
         return habitacionesCategoria;
     }
 
-    // Devuelve un Int diciendo cuantas habitaciones están disponibles sin mas
+    // Devuelve un Int diciendo cuantas habitaciones están disponibles sin más
     public int getNumHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
             throws HotelNoEncontradoException, FechasInvalidasException {
 
@@ -284,11 +284,11 @@ public class Datos {
     }
 
     public Lista<Reserva> listarTodasLasReservas() {
-        return ordenarReservas(new ArrayList<>(reservas.values()));
+        return ordenarReservas(new Lista<>(reservas.values()));
     }
 
     public Lista<Reserva> buscarReservasPorClientes(String dni) {
-        Lista<Reserva> resultado = new ArrayList<>();
+        Lista<Reserva> resultado = new Lista<>();
         for (Reserva r : reservas.values()) {
             if (r.getCliente() !=null && r.getCliente().getDni().equalsIgnoreCase(dni)) {
                 resultado.add(r);
@@ -298,7 +298,7 @@ public class Datos {
     }
 
     public Lista<Reserva> buscarReservasPorHotel(int hotelId) {
-        Lista<Reserva> resultado = new ArrayList<>();
+        Lista<Reserva> resultado = new Lista<>();
         for (Reserva r : reservas.values()) {
             if (r.getHotel() != null && r.getHotel().getId() == hotelId) {
                 resultado.add(r);
@@ -308,7 +308,7 @@ public class Datos {
     }
 
     public Lista<Reserva> buscarReservasPorFechaEntrada(LocalDate fecha) {
-        Lista<Reserva> resultado = new ArrayList<>();
+        Lista<Reserva> resultado = new Lista<>();
         for (Reserva r : reservas.values()) {
             if (r.getFechaEntrada() != null && r.getFechaEntrada().equals(fecha)) {
                 resultado.add(r);
@@ -318,7 +318,7 @@ public class Datos {
     }
 
     public Lista<Reserva> buscarReservasPorFechaSalida(LocalDate fecha) {
-        Lista<Reserva> resultado = new ArrayList<>();
+        Lista<Reserva> resultado = new Lista<>();
         for (Reserva r : reservas.values()) {
             if (r.getFechaSalida() != null && r.getFechaSalida().equals(fecha)) {
                 resultado.add(r);
@@ -328,7 +328,7 @@ public class Datos {
     }
 
     public Lista<Reserva> buscarReservasPorEstado(EstadoReserva estado) {
-        Lista<Reserva> resultado = new ArrayList<>();
+        Lista<Reserva> resultado = new Lista<>();
         for (Reserva r : reservas.values()) {
             if (r.getEstado() == estado) {
                 resultado.add(r);
