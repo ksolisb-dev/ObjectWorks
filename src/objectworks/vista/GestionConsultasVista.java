@@ -44,10 +44,16 @@ public class GestionConsultasVista {
                         System.out.println("Opción no válida");
                 }
             } catch (Exception e) {
+                // Si el usuario se equivoca con una fecha errónea o un ID que no sea numérico, lo capturamos aquí.
                 System.out.println("Error en la busqueda: " + e.getMessage());
             }
         } while (!volver);
     }
+
+    /**
+     * Se ha creado este método auxiliar para no estar repitiendo el System.out.print +
+     *  teclado.nextLine() en cada método que se ha creado.
+     */
 
     private String pedir(String mensaje) {
         System.out.println(mensaje);
@@ -98,6 +104,11 @@ public class GestionConsultasVista {
             System.out.println("Estado no valido");
             return;
         }
+
+        /**
+         * Convertimos el número que ha introducido el usuario con el valor del
+         * Enum (CONFIRMADA, CANCELADA, ...)
+         */
 
         EstadoReserva estado = EstadoReserva.values()[opcionEstado -1];
         mostrarLista(controlador.buscarReservasPorEstado(estado));

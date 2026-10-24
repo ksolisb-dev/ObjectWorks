@@ -26,6 +26,7 @@ public class Datos {
             cargarClientesPrueba();
             cargarHotelesPrueba();
             cargarHabitacionesPrueba();
+            cargarReservasPrueba();
          } catch (Exception e) {
             System.err.println("Error cargando datos de prueba: " + e.getMessage());
         }
@@ -404,8 +405,12 @@ public class Datos {
 
     //------------------------PARTE 5: CONSULTA DE RESERVAS-------------------------
 
+    /**
+     * Este método auxiliar privado servirá para ordenar las listas de reservas
+     * utilizando Comparator, tal y como se indica en la rúbrica, para que ordene las reservas
+     * de más antigua a más reciente.
+     */
     private Lista<Reserva> ordenarReservas(Lista<Reserva> lista) {
-
         lista.sort(Comparator.comparing(Reserva::getFechaEntrada));
         return lista;
     }
@@ -413,6 +418,12 @@ public class Datos {
     public Lista<Reserva> listarTodasLasReservas() {
         return ordenarReservas(new Lista<>(reservas.values()));
     }
+
+    /**
+     * Filtra las reservas por el DNI del cliente.
+     * Se utiliza equalsIgnoreCase para evitar problemas con la letra del DNI, si se escribe
+     * en mayúscula o minúscula
+     */
 
     public Lista<Reserva> buscarReservasPorClientes(String dni) {
         Lista<Reserva> resultado = new Lista<>();
@@ -424,6 +435,10 @@ public class Datos {
         return ordenarReservas(resultado);
     }
 
+    /**
+     * Filtra las reservas por el ID del hotel.
+     */
+
     public Lista<Reserva> buscarReservasPorHotel(int hotelId) {
         Lista<Reserva> resultado = new Lista<>();
         for (Reserva r : reservas.values()) {
@@ -433,6 +448,10 @@ public class Datos {
         }
         return ordenarReservas(resultado);
     }
+
+    /**
+     * Funciones para filtrar por fecha de entrada o salida
+     */
 
     public Lista<Reserva> buscarReservasPorFechaEntrada(LocalDate fecha) {
         Lista<Reserva> resultado = new Lista<>();
@@ -453,6 +472,11 @@ public class Datos {
         }
         return ordenarReservas(resultado);
     }
+
+    /**
+     * Filtrar las reservas por el estado actual.
+     */
+
 
     public Lista<Reserva> buscarReservasPorEstado(EstadoReserva estado) {
         Lista<Reserva> resultado = new Lista<>();
