@@ -106,6 +106,13 @@ public class Controlador {
         return datos.buscarReservaPorId(idReserva);
     }
 
+    // Lista todas las reservas de un cliente
+    public Lista<Reserva> listarReservasCliente(String dniCliente)
+            throws ClienteNoEncontradoException {
+
+        return datos.listarReservasCliente(dniCliente);
+    }
+
     public Reserva crearReserva(String dniCliente, int hotelId, LocalDate entrada, LocalDate salida, int numPersonas, Lista<Habitacion> habitacionesSeleccionadas)
                 throws ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, DatoObligatorioException, DatoInvalidoException, HabitacionOcupadaException {
 

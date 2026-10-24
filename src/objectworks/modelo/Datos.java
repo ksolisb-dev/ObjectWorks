@@ -402,6 +402,23 @@ public class Datos {
         return reserva;
 
     }
+
+    public Lista<Reserva> listarReservasCliente(String dniCliente)
+            throws ClienteNoEncontradoException {
+
+        Cliente cliente = getCliente(dniCliente);
+        Lista<Reserva> reservasCliente = new Lista<>();
+
+        for (Reserva reserva : reservas.values()) {
+            if (reserva.getCliente().equals(cliente)) {
+                reservasCliente.add(reserva);
+            }
+        }
+
+        reservasCliente.sort(Comparator.comparing(Reserva::getFechaCreacion));
+
+        return reservasCliente;
+    }
             
 
     // ===================== DATOS DE PRUEBA =====================
