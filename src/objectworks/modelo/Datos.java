@@ -20,14 +20,14 @@ public class Datos {
     public Datos() {
         clientes = new HashMap<>();
         try {
-            // Ir añadiendo aqui las cosas que quereis que cargue de prueba
+            // ¡Ir añadiendo aquí las cosas que queréis que cargue de prueba
             // Como le puse validador han de pasar por aquí así si peta el catch
             // coge lo que sea que haya petado!
             cargarClientesPrueba();
             cargarHotelesPrueba();
             cargarHabitacionesPrueba();
             cargarReservasPrueba();
-        } catch (Exception e) {
+         } catch (Exception e) {
             System.err.println("Error cargando datos de prueba: " + e.getMessage());
         }
     }
@@ -178,7 +178,7 @@ public class Datos {
         return listaDisponibles;
     }
 
-    // Función clonada de la de arriba pero que itera por categorías sin tener en cuenta fechas
+    // Función clonada de la de arriba, pero que itera por categorías sin tener en cuenta fechas
     public Lista<Habitacion> getHabitacionesPorCategoria(int hotelId, CategoriaHabitacion categoria)
             throws HotelNoEncontradoException {
 
@@ -194,7 +194,7 @@ public class Datos {
         return habitacionesCategoria;
     }
 
-    // Devuelve un Int diciendo cuantas habitaciones están disponibles sin mas
+    // Devuelve un Int diciendo cuantas habitaciones están disponibles sin más
     public int getNumHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
             throws HotelNoEncontradoException, FechasInvalidasException {
 
@@ -304,7 +304,7 @@ public class Datos {
 
         // Creamos la reserva
         Reserva nuevaReserva = new Reserva(idReserva, entrada, salida, numPersonas, LocalDate.now(), EstadoReserva.CONFIRMADA, hotel, cliente, habitacionesComprobadas);
-        
+
         // Guardamos la reserva en el mapa de reservas después de validar todo
         reservas.put(idReserva, nuevaReserva);
 
@@ -316,7 +316,7 @@ public class Datos {
             throws ReservaNoEncontradaException {
 
         Reserva reserva = reservas.get(idReserva);
-        
+
         if (reserva == null) {
             throw new ReservaNoEncontradaException("No existe ninguna reserva con id " + idReserva);
         }
@@ -327,7 +327,7 @@ public class Datos {
     // Cancelar una reserva por Id
     public void cancelarReserva(int idReserva)
             throws ReservaNoEncontradaException {
-        
+
         Reserva reserva = buscarReservaPorId(idReserva);
         reserva.cancelar();
     }
@@ -419,7 +419,91 @@ public class Datos {
 
         return reservasCliente;
     }
-            
+
+    //------------------------PARTE 5: CONSULTA DE RESERVAS-------------------------
+
+    /**
+     * Este método auxiliar privado servirá para ordenar las listas de reservas
+     * utilizando Comparator, tal y como se indica en la rúbrica, para que ordene las reservas
+     * de más antigua a más reciente.
+     */
+    private Lista<Reserva> ordenarReservas(Lista<Reserva> lista) {
+        lista.sort(Comparator.comparing(Reserva::getFechaEntrada));
+        return lista;
+    }
+
+    public Lista<Reserva> listarTodasLasReservas() {
+        return ordenarReservas(new Lista<>(reservas.values()));
+    }
+
+    /**
+     * Filtra las reservas por el DNI del cliente.
+     * Se utiliza equalsIgnoreCase para evitar problemas con la letra del DNI, si se escribe
+     * en mayúscula o minúscula
+     */
+
+    public Lista<Reserva> buscarReservasPorClientes(String dni) {
+        Lista<Reserva> resultado = new Lista<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getCliente() !=null && r.getCliente().getDni().equalsIgnoreCase(dni)) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    /**
+     * Filtra las reservas por el ID del hotel.
+     */
+
+    public Lista<Reserva> buscarReservasPorHotel(int hotelId) {
+        Lista<Reserva> resultado = new Lista<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getHotel() != null && r.getHotel().getId() == hotelId) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    /**
+     * Funciones para filtrar por fecha de entrada o salida
+     */
+
+    public Lista<Reserva> buscarReservasPorFechaEntrada(LocalDate fecha) {
+        Lista<Reserva> resultado = new Lista<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getFechaEntrada() != null && r.getFechaEntrada().equals(fecha)) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    public Lista<Reserva> buscarReservasPorFechaSalida(LocalDate fecha) {
+        Lista<Reserva> resultado = new Lista<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getFechaSalida() != null && r.getFechaSalida().equals(fecha)) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
+
+    /**
+     * Filtrar las reservas por el estado actual.
+     */
+
+
+    public Lista<Reserva> buscarReservasPorEstado(EstadoReserva estado) {
+        Lista<Reserva> resultado = new Lista<>();
+        for (Reserva r : reservas.values()) {
+            if (r.getEstado() == estado) {
+                resultado.add(r);
+            }
+        }
+        return ordenarReservas(resultado);
+    }
 
     // ===================== DATOS DE PRUEBA =====================
 
@@ -457,7 +541,7 @@ public class Datos {
     // Reservas de prueba
     private void cargarReservasPrueba()
             throws DatoObligatorioException, ClienteNoEncontradoException, HotelNoEncontradoException, FechasInvalidasException, HabitacionOcupadaException {
-        
+
         String[] dnis = {"11111111A", "22222222B", "33333333C", "44444444D", "55555555E"};
 
         int[] idHoteles = {1, 2, 3, 1, 2};
@@ -477,5 +561,4 @@ public class Datos {
             crearReserva(dnis[i], hotel.getId(), entrada, salida, 2, seleccion);
         }
     }
-    
 }
