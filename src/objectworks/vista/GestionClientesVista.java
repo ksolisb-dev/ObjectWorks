@@ -3,6 +3,7 @@ package objectworks.vista;
 import java.util.Scanner;
 import objectworks.controlador.Controlador;
 import objectworks.modelo.Lista;
+import objectworks.modelo.Reserva;
 
 public class GestionClientesVista {
     private Controlador controlador;
@@ -33,7 +34,7 @@ public class GestionClientesVista {
                 case "3": anadir(); break;
                 case "4": modificar(); break;
                 case "5": eliminar(); break;
-                case "6": System.out.println("Disponible cuando se implementen las reservas (Parte 4)"); break;
+                case "6": mostrarListaReservas(); break;
                 case "0": volver = true; break;
                 default: System.out.println("Opcion no valida");
             }
@@ -106,6 +107,23 @@ public class GestionClientesVista {
             for (String linea : lista.getArrayList()) {
                 System.out.println(linea);
             }
+        }
+    }
+
+    // Muestra lista reservas de un cliente
+    public void mostrarListaReservas() {
+        String dni = pedir("DNI del cliente: ");
+        try {
+            Lista<Reserva> reservas = controlador.listarReservasCliente(dni);
+            if (reservas.isEmpty()) {
+                System.out.println("No hay reservas para este cliente");
+            } else {
+                for (Reserva reserva : reservas.getArrayList()) {
+                    System.out.println(reserva);
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
