@@ -1,5 +1,6 @@
 package objectworks.vista;
 
+import objectworks.controlador.ClienteController;
 import objectworks.controlador.Controlador;
 import objectworks.modelo.Habitacion;
 import objectworks.modelo.Lista;
@@ -12,13 +13,17 @@ import java.util.Scanner;
 public class GestionReservasVista {
 
     private final Controlador controlador;
+    // Los clientes ya se leen de la BD a traves de su propio controlador
+    private final ClienteController clienteController;
     private final Scanner teclado;
 
     public GestionReservasVista(
             Controlador controlador,
+            ClienteController clienteController,
             Scanner teclado) {
 
         this.controlador = controlador;
+        this.clienteController = clienteController;
         this.teclado = teclado;
     }
 
@@ -91,12 +96,12 @@ public class GestionReservasVista {
         System.out.println("\n--- Crear reserva ---");
 
         // Seleccionar un cliente existente.
-        mostrarLista(controlador.listarClientes());
+        mostrarLista(clienteController.listarClientes());
 
         String dni = leerTexto("DNI del cliente: ");
 
         // Comprobar que existe antes de seguir preguntando.
-        System.out.println(controlador.verCliente(dni));
+        System.out.println(clienteController.verCliente(dni));
 
         // Seleccionar hotel y fechas.
         mostrarLista(controlador.listarHoteles());

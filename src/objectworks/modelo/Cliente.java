@@ -3,6 +3,7 @@ package objectworks.modelo;
 import java.util.Objects;
 
 public class Cliente {
+    private int id;          // Clave primaria autonumerica en la BD (0 = todavia no guardado)
     private String dni;
     private String nombre;
     private String apellidos;
@@ -13,8 +14,14 @@ public class Cliente {
     public Cliente() {
     }
 
-    // Constructor completo
+    // Constructor para clientes nuevos (la BD les asigna el id al insertarlos)
     public Cliente(String dni, String nombre, String apellidos, String email, String telefono) {
+        this(0, dni, nombre, apellidos, email, telefono);
+    }
+
+    // Constructor completo (lo usa el DAO al leer de la BD)
+    public Cliente(int id, String dni, String nombre, String apellidos, String email, String telefono) {
+        this.id = id;
         this.dni = dni;
         this.nombre = nombre;
         this.apellidos = apellidos;
@@ -23,6 +30,9 @@ public class Cliente {
     }
 
     // Getters y setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
+
     public String getDni() { return dni; }
     public void setDni(String dni) { this.dni = dni; }
 
@@ -54,9 +64,10 @@ public class Cliente {
 
     @Override
     public String toString() {
-        return "DNI: " + dni +
+        return "ID: " + id +
+               " | DNI: " + dni +
                " | " + nombre + " " + apellidos +
                " | Email: " + email +
-               " | Tel: " + telefono;
+               " | Tel: " + (telefono == null ? "-" : telefono);
     }
 }
