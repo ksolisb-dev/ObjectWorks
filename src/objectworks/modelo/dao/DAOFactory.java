@@ -19,7 +19,7 @@ public abstract class DAOFactory {
     public abstract ClienteDAO getClienteDAO();
     // public abstract HotelDAO getHotelDAO();            // Parte 2
     // public abstract HabitacionDAO getHabitacionDAO();  // Parte 3
-    // public abstract ReservaDAO getReservaDAO();        // Parte 4
+    public abstract ReservaDAO getReservaDAO();        // Parte 4 - Hecha
 
     /** Comprueba que el almacen de datos esta disponible. */
     public abstract boolean probarConexion();
