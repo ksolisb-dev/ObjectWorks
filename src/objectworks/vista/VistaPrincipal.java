@@ -3,6 +3,7 @@ package objectworks.vista;
 import java.util.Scanner;
 import objectworks.controlador.ClienteController;
 import objectworks.controlador.Controlador;
+import objectworks.controlador.ReservaController;
 import objectworks.modelo.*;
 import objectworks.modelo.enums.CategoriaHabitacion;
 import objectworks.modelo.exceptions.DatoObligatorioException;
@@ -13,13 +14,15 @@ import java.time.LocalDate;
 
 public class VistaPrincipal {
     private final ClienteController clienteController;
+    private final ReservaController reservaController;
     // TODO: cada parte sustituye este Controlador antiguo por su propio controlador
     // (HotelController, HabitacionController, ReservaController, ConsultaReservaController)
     private Controlador controlador;
     private Scanner teclado = new Scanner(System.in);
 
-    public VistaPrincipal(ClienteController clienteController) {
+    public VistaPrincipal(ClienteController clienteController, ReservaController reservaController) {
         this.clienteController = clienteController;
+        this.reservaController = reservaController;
         this.controlador = new Controlador();
     }
 
@@ -49,7 +52,7 @@ public class VistaPrincipal {
             } else if (opcion.equals("3")) {
                 new GestionHabitacionesVista(controlador, teclado).menu();
             } else if (opcion.equals("4")) {
-                new GestionReservasVista(controlador, clienteController, teclado).menu();
+                new GestionReservasVista(reservaController, clienteController, teclado).menu();
             } else if (opcion.equals("5")) {
                 new GestionConsultasVista(controlador, teclado).menu();
             } else if (opcion.equals("0")) {
