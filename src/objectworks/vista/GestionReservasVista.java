@@ -1,6 +1,7 @@
 package objectworks.vista;
 
 import objectworks.controlador.ClienteController;
+import objectworks.controlador.ReservaController;
 import objectworks.controlador.Controlador;
 import objectworks.modelo.Habitacion;
 import objectworks.modelo.Lista;
@@ -12,17 +13,17 @@ import java.util.Scanner;
 
 public class GestionReservasVista {
 
-    private final Controlador controlador;
+    private final ReservaController reservaController;
     // Los clientes ya se leen de la BD a traves de su propio controlador
     private final ClienteController clienteController;
     private final Scanner teclado;
 
     public GestionReservasVista(
-            Controlador controlador,
+            ReservaController reservaController,
             ClienteController clienteController,
             Scanner teclado) {
 
-        this.controlador = controlador;
+        this.reservaController = reservaController;
         this.clienteController = clienteController;
         this.teclado = teclado;
     }
@@ -58,7 +59,7 @@ public class GestionReservasVista {
                         break;
 
                     case "4":
-                        mostrarLista(controlador.listarReservas());
+                        mostrarLista(reservaController.listarReservas());
                         break;
 
                     case "0":
@@ -104,7 +105,7 @@ public class GestionReservasVista {
         System.out.println(clienteController.verCliente(dni));
 
         // Seleccionar hotel y fechas.
-        mostrarLista(controlador.listarHoteles());
+        mostrarLista(reservaController.listarHoteles());
 
         int hotelId = leerEntero("ID del hotel: ");
         LocalDate entrada = leerFecha("Fecha de entrada");
@@ -112,7 +113,7 @@ public class GestionReservasVista {
 
         // Consultar las opciones disponibles.
         Lista<Habitacion> disponibles =
-                controlador.getHabitacionesDisponibles(
+                reservaController.getHabitacionesDisponibles(
                         hotelId, entrada, salida
                 );
 
@@ -137,7 +138,7 @@ public class GestionReservasVista {
             return;
         }
 
-        Reserva reserva = controlador.crearReserva(
+        Reserva reserva = reservaController.crearReserva(
                 dni,
                 hotelId,
                 entrada,
@@ -155,7 +156,7 @@ public class GestionReservasVista {
     private void modificarReserva() throws Exception {
         System.out.println("\n--- Modificar reserva ---");
 
-        Lista<Reserva> reservas = controlador.listarReservas();
+        Lista<Reserva> reservas = reservaController.listarReservas();
 
         if (reservas.isEmpty()) {
             System.out.println("No hay reservas registradas.");
@@ -167,7 +168,7 @@ public class GestionReservasVista {
         int idReserva = leerEntero("ID de la reserva: ");
 
         Reserva reserva =
-                controlador.buscarReservaPorId(idReserva);
+                reservaController.buscarReservaPorId(idReserva);
 
         System.out.println("Datos actuales:");
         System.out.println(reserva);
@@ -177,7 +178,7 @@ public class GestionReservasVista {
         LocalDate salida = leerFecha("Nueva fecha de salida");
 
         Lista<Habitacion> disponibles =
-                controlador.habitacionesDisponiblesParaModificar(
+                reservaController.habitacionesDisponiblesParaModificar(
                         idReserva, entrada, salida
                 );
 
@@ -203,7 +204,7 @@ public class GestionReservasVista {
             return;
         }
 
-        Reserva modificada = controlador.modificarReserva(
+        Reserva modificada = reservaController.modificarReserva(
                 idReserva,
                 entrada,
                 salida,
@@ -220,7 +221,7 @@ public class GestionReservasVista {
     private void cancelarReserva() throws Exception {
         System.out.println("\n--- Cancelar reserva ---");
 
-        Lista<Reserva> reservas = controlador.listarReservas();
+        Lista<Reserva> reservas = reservaController.listarReservas();
 
         if (reservas.isEmpty()) {
             System.out.println("No hay reservas registradas.");
@@ -232,7 +233,7 @@ public class GestionReservasVista {
         int idReserva = leerEntero("ID de la reserva: ");
 
         Reserva reserva =
-                controlador.buscarReservaPorId(idReserva);
+                reservaController.buscarReservaPorId(idReserva);
 
         System.out.println(reserva);
 
@@ -241,7 +242,7 @@ public class GestionReservasVista {
             return;
         }
 
-        controlador.cancelarReserva(idReserva);
+        reservaController.cancelarReserva(idReserva);
 
         System.out.println("Reserva cancelada correctamente.");
     }
