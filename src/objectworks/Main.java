@@ -1,6 +1,7 @@
 package objectworks;
 
 import objectworks.controlador.ClienteController;
+import objectworks.controlador.ReservaController;
 import objectworks.modelo.dao.DAOFactory;
 import objectworks.vista.VistaPrincipal;
 
@@ -11,8 +12,9 @@ public class Main {
 
         // Un controlador por cada gestion (los demas se anaden en sus partes)
         ClienteController clienteController = new ClienteController(factory);
+        ReservaController reservaController = new ReservaController(factory);
 
-        VistaPrincipal vista = new VistaPrincipal(clienteController);
+        VistaPrincipal vista = new VistaPrincipal(clienteController, reservaController);
         if (!factory.probarConexion()) {
             vista.mostrarErrorConexion();
             return;
