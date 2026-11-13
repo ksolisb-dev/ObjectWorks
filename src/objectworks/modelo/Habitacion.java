@@ -10,10 +10,10 @@ public abstract class Habitacion {
     protected double precioBaseNoche; // Si no le pongo protected no me lo deja usar
     // Como es un cambio de ultima hora no estoy muy seguro si esto iba aquí, pero juraría que si
 
-    public Habitacion(int id, String nombre, String planta,
+    public Habitacion(int id, String numero, String planta,
                       int capacidad) {
         this.id = id;
-        this.numero = nombre;
+        this.numero = numero;
         this.planta = planta;
         this.capacidad = capacidad;
     }
