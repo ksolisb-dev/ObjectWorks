@@ -1,16 +1,20 @@
 package objectworks.vista;
 
 import java.util.Scanner;
+import objectworks.controlador.ClienteController;
 import objectworks.controlador.Controlador;
 import objectworks.modelo.Lista;
 import objectworks.modelo.Reserva;
 
 public class GestionClientesVista {
-    private Controlador controlador;
+    private ClienteController controlador;
+    // TODO Parte 4: cambiar por ReservaController cuando las reservas esten en la BD
+    private Controlador controladorReservas;
     private Scanner teclado;
 
-    public GestionClientesVista(Controlador controlador, Scanner teclado) {
+    public GestionClientesVista(ClienteController controlador, Controlador controladorReservas, Scanner teclado) {
         this.controlador = controlador;
+        this.controladorReservas = controladorReservas;
         this.teclado = teclado;
     }
 
@@ -42,12 +46,20 @@ public class GestionClientesVista {
     }
 
     private void listar() {
-        mostrarLista(controlador.listarClientes());
+        try {
+            mostrarLista(controlador.listarClientes());
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void buscar() {
         String texto = pedir("Nombre o apellido a buscar: ");
-        mostrarLista(controlador.buscarClientes(texto));
+        try {
+            mostrarLista(controlador.buscarClientes(texto));
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 
     private void anadir() {
@@ -114,7 +126,7 @@ public class GestionClientesVista {
     public void mostrarListaReservas() {
         String dni = pedir("DNI del cliente: ");
         try {
-            Lista<Reserva> reservas = controlador.listarReservasCliente(dni);
+            Lista<Reserva> reservas = controladorReservas.listarReservasCliente(dni);
             if (reservas.isEmpty()) {
                 System.out.println("No hay reservas para este cliente");
             } else {

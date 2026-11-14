@@ -15,42 +15,7 @@ public class Controlador {
         this.datos = new Datos(); // ahora datos() ya carga las cosas asi que te borro lo de cargar lo de prueba
     }
 
-    // ===================== CLIENTES =====================
-    // Devolvemos texto para que la Vista no toque clases del Modelo
-
-    public Lista<String> listarClientes() {
-        return aTexto(datos.listarClientes());
-    }
-
-    public Lista<String> buscarClientes(String texto) {
-        return aTexto(datos.buscarClientes(texto));
-    }
-
-    public String verCliente(String dni) throws ClienteNoEncontradoException {
-        return datos.getCliente(dni).toString();
-    }
-
-    public void anadirCliente(String dni, String nombre, String apellidos, String email, String telefono)
-            throws DatoInvalidoException, ClienteDuplicadoException {
-        datos.anadirCliente(dni, nombre, apellidos, email, telefono);
-    }
-
-    public void modificarCliente(String dni, String nombre, String apellidos, String email, String telefono)
-            throws ClienteNoEncontradoException, DatoInvalidoException {
-        datos.modificarCliente(dni, nombre, apellidos, email, telefono);
-    }
-
-    public void eliminarCliente(String dni) throws ClienteNoEncontradoException {
-        datos.eliminarCliente(dni);
-    }
-
-    private Lista<String> aTexto(Lista<Cliente> lista) {
-        Lista<String> resultado = new Lista<>();
-        for (Cliente c : lista.getArrayList()) {
-            resultado.add(c.toString());
-        }
-        return resultado;
-    }
+    // CLIENTES: movido a ClienteController (Producto 3, Parte 1)
 
     // ===================== HOTELES =====================
     // No las he testeado mucho....

@@ -1,12 +1,22 @@
 package objectworks;
 
-import objectworks.controlador.Controlador;
+import objectworks.controlador.ClienteController;
+import objectworks.modelo.dao.DAOFactory;
 import objectworks.vista.VistaPrincipal;
 
 public class Main {
     public static void main(String[] args) {
-        Controlador controlador = new Controlador();
-        VistaPrincipal vista = new VistaPrincipal();
+        // Patron Factory: el unico sitio donde se elige el motor de base de datos
+        DAOFactory factory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+
+        // Un controlador por cada gestion (los demas se anaden en sus partes)
+        ClienteController clienteController = new ClienteController(factory);
+
+        VistaPrincipal vista = new VistaPrincipal(clienteController);
+        if (!factory.probarConexion()) {
+            vista.mostrarErrorConexion();
+            return;
+        }
         vista.inicio();
     }
 }
