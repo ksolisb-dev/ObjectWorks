@@ -1,6 +1,6 @@
 package objectworks.vista;
 
-import objectworks.controlador.Controlador;
+import objectworks.controlador.HotelController;
 import objectworks.modelo.Habitacion;
 import objectworks.modelo.Hotel;
 import objectworks.modelo.Lista;
@@ -14,10 +14,12 @@ import java.util.Scanner;
 
 public class GestionHotelesVista {
 
-    private Controlador controlador;
+    private HotelController controlador;
+    // TODO (PARTE 3): Cuando esté creado, descomentar y usar el HabitaciónControler
+    // private HabitacionController habitacionController;
     private Scanner teclado;
 
-    public GestionHotelesVista(Controlador controlador, Scanner teclado) {
+    public GestionHotelesVista(HotelController controlador, Scanner teclado) {
         this.controlador = controlador;
         this.teclado = teclado;
     }
@@ -41,11 +43,11 @@ public class GestionHotelesVista {
                 } else if (opcion.equals("2")) {
                     buscarPorCiudad();
                 } else if (opcion.equals("3")) {
-                    habitacionesDisponibles();
+                    //habitacionesDisponibles();
                 } else if (opcion.equals("4")) {
-                    habitacionesPorCategoria();
+                    //habitacionesPorCategoria();
                 } else if (opcion.equals("5")) {
-                    numDisponibles();
+                    //numDisponibles();
                 } else if (opcion.equals("0")) {
                     volver = true;
                 } else {
@@ -58,87 +60,100 @@ public class GestionHotelesVista {
     }
 
     private void listarHoteles() {
-        Lista<Hotel> hoteles = controlador.listarHoteles();
-        if (hoteles.isEmpty()) {
-            System.out.println("No hay hoteles");
-        } else {
-            for (Hotel h : hoteles.getArrayList()) {
-                System.out.println(h);
+        try {
+            Lista<Hotel> hoteles = controlador.listarHoteles();
+            if (hoteles.isEmpty()) {
+                System.out.println("No hay hoteles");
+            } else {
+                for (Hotel h : hoteles.getArrayList()) {
+                    System.out.println(h);
+                }
             }
+        } catch (Exception e) {
+            System.out.println("Error al listar: " + e.getMessage());
         }
     }
 
     private void buscarPorCiudad() throws DatoObligatorioException {
         System.out.print("Ciudad: ");
         String ciudad = teclado.nextLine();
-        Lista<Hotel> hoteles = controlador.buscarHotelesPorCiudad(ciudad);
-        if (hoteles.isEmpty()) {
-            System.out.println("No se encontraron hoteles");
-        } else {
-            for (Hotel h : hoteles.getArrayList()) {
-                System.out.println(h);
+        try {
+            Lista<Hotel> hoteles = controlador.buscarHotelesPorCiudad(ciudad);
+            if (hoteles.isEmpty()) {
+                System.out.println("No se encontraron hoteles");
+            } else {
+                for (Hotel h : hoteles.getArrayList()) {
+                    System.out.println(h);
+                }
             }
+        } catch (DatoObligatorioException e) {
+            System.out.println("Error de validación: " + e.getMessage());
+        } catch (Exception e) {
+            System.out.println("Error de base de datos: " + e.getMessage());
         }
     }
 
-    private void habitacionesDisponibles() throws HotelNoEncontradoException, FechasInvalidasException {
-        System.out.print("ID del hotel: ");
-        int id = Integer.parseInt(teclado.nextLine());
-        System.out.print("Fecha entrada (yyyy-MM-dd): ");
-        LocalDate entrada = LocalDate.parse(teclado.nextLine());
-        System.out.print("Fecha salida (yyyy-MM-dd): ");
-        LocalDate salida = LocalDate.parse(teclado.nextLine());
+    //He comentado todos los métodos de abajo y su llamada en el menú, ya que necesitan del HabitacionController.
+    //Una vez creado solo hará falta descomentar el código y pasar el controlador por el constructor de vista.
 
-        Lista<Habitacion> habs = controlador.habitacionesDisponibles(id, entrada, salida);
-        if (habs.isEmpty()) {
-            System.out.println("No hay habitaciones disponibles");
-        } else {
-            for (Habitacion h : habs.getArrayList()) {
-                System.out.println(h);
-            }
-        }
-    }
-
-    private void habitacionesPorCategoria() throws HotelNoEncontradoException {
-        System.out.print("ID del hotel: ");
-        int id = Integer.parseInt(teclado.nextLine());
-        System.out.println("1. Estandar");
-        System.out.println("2. Superior");
-        System.out.println("3. Suite");
-        System.out.print("Categoria: ");
-        int cat = Integer.parseInt(teclado.nextLine());
-
-        CategoriaHabitacion categoria = null;
-        if (cat == 1) {
-            categoria = CategoriaHabitacion.ESTANDAR;
-        } else if (cat == 2) {
-            categoria = CategoriaHabitacion.SUPERIOR;
-        } else if (cat == 3) {
-            categoria = CategoriaHabitacion.SUITE;
-        } else {
-            System.out.println("Categoria no valida");
-            return;
-        }
-
-        Lista<Habitacion> habs = controlador.habitacionesPorCategoria(id, categoria);
-        if (habs.isEmpty()) {
-            System.out.println("No hay habitaciones de esa categoria");
-        } else {
-            for (Habitacion h : habs.getArrayList()) {
-                System.out.println(h);
-            }
-        }
-    }
-
-    private void numDisponibles() throws HotelNoEncontradoException, FechasInvalidasException {
-        System.out.print("ID del hotel: ");
-        int id = Integer.parseInt(teclado.nextLine());
-        System.out.print("Fecha entrada (yyyy-MM-dd): ");
-        LocalDate entrada = LocalDate.parse(teclado.nextLine());
-        System.out.print("Fecha salida (yyyy-MM-dd): ");
-        LocalDate salida = LocalDate.parse(teclado.nextLine());
-
-        int num = controlador.numHabitacionesDisponibles(id, entrada, salida);
-        System.out.println("Habitaciones disponibles: " + num);
-    }
+//    private void habitacionesDisponibles() throws HotelNoEncontradoException, FechasInvalidasException {
+//        System.out.print("ID del hotel: ");
+//        int id = Integer.parseInt(teclado.nextLine());
+//        System.out.print("Fecha entrada (yyyy-MM-dd): ");
+//        LocalDate entrada = LocalDate.parse(teclado.nextLine());
+//        System.out.print("Fecha salida (yyyy-MM-dd): ");
+//        LocalDate salida = LocalDate.parse(teclado.nextLine());
+//
+//        Lista<Habitacion> habs = controlador.habitacionesDisponibles(id, entrada, salida);
+//        if (habs.isEmpty()) {
+//            System.out.println("No hay habitaciones disponibles");
+//        } else {
+//            for (Habitacion h : habs.getArrayList()) {
+//                System.out.println(h);
+//            }
+//        }
+//    }
+//
+//    private void habitacionesPorCategoria() throws HotelNoEncontradoException {
+//        System.out.print("ID del hotel: ");
+//        int id = Integer.parseInt(teclado.nextLine());
+//        System.out.println("1. Estandar");
+//        System.out.println("2. Superior");
+//        System.out.println("3. Suite");
+//        System.out.print("Categoria: ");
+//        int cat = Integer.parseInt(teclado.nextLine());
+//
+//        CategoriaHabitacion categoria = null;
+//        if (cat == 1) {
+//            categoria = CategoriaHabitacion.ESTANDAR;
+//        } else if (cat == 2) {
+//            categoria = CategoriaHabitacion.SUPERIOR;
+//        } else if (cat == 3) {
+//            categoria = CategoriaHabitacion.SUITE;
+//        } else {
+//            System.out.println("Categoria no valida");
+//            return;
+//        }
+//
+//        Lista<Habitacion> habs = controlador.habitacionesPorCategoria(id, categoria);
+//        if (habs.isEmpty()) {
+//            System.out.println("No hay habitaciones de esa categoria");
+//        } else {
+//            for (Habitacion h : habs.getArrayList()) {
+//                System.out.println(h);
+//            }
+//        }
+//    }
+//
+//    private void numDisponibles() throws HotelNoEncontradoException, FechasInvalidasException {
+//        System.out.print("ID del hotel: ");
+//        int id = Integer.parseInt(teclado.nextLine());
+//        System.out.print("Fecha entrada (yyyy-MM-dd): ");
+//        LocalDate entrada = LocalDate.parse(teclado.nextLine());
+//        System.out.print("Fecha salida (yyyy-MM-dd): ");
+//        LocalDate salida = LocalDate.parse(teclado.nextLine());
+//
+//        int num = controlador.numHabitacionesDisponibles(id, entrada, salida);
+//        System.out.println("Habitaciones disponibles: " + num);
+//    }
 }

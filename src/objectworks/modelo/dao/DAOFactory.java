@@ -17,7 +17,7 @@ public abstract class DAOFactory {
     public static final int MYSQL = 1;
 
     public abstract ClienteDAO getClienteDAO();
-    // public abstract HotelDAO getHotelDAO();            // Parte 2
+    public abstract HotelDAO getHotelDAO();
     // public abstract HabitacionDAO getHabitacionDAO();  // Parte 3
     // public abstract ReservaDAO getReservaDAO();        // Parte 4
 
