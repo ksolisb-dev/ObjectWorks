@@ -1,5 +1,6 @@
-package objectworks.modelo;
+package objectworks.modelo.tests;
 
+import objectworks.modelo.*;
 import objectworks.modelo.enums.EstadoReserva;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -49,12 +50,6 @@ class ReservaTest {
     void testCalcularImporteError() {
         Lista<Habitacion> listaHabs = new Lista<>();
         listaHabs.add(hab1);
-
-        /**
-         * Al crear la reserva con fechas erróneas, el constructor llama a calcularImporte()
-         * y debe lanzar una IllegalArgumentException. El assertThrows captura ese error y el test
-         * pasa a verde
-         */
 
         assertThrows(IllegalArgumentException.class, () -> {
                     new Reserva(3, LocalDate.of(2026, 10, 5), LocalDate.of(2026, 10, 1),1, LocalDate.now(),EstadoReserva.CONFIRMADA, hotel, cliente, listaHabs);

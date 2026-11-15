@@ -161,6 +161,33 @@ public class Reserva {
         this.estado = EstadoReserva.CANCELADA;
     }
 
+    /**
+     * Indica si esta reserva impide reservar la habitacion entre esas fechas.
+     * (Antes estaba en Datos.estaDisponible; la BD hace la misma comprobacion en SQL.)
+     * - Una reserva cancelada no ocupa nada.
+     * - El dia de salida la habitacion ya queda libre: se puede entrar el mismo dia que otro sale.
+     */
+    public boolean ocupaHabitacion(Habitacion habitacion, LocalDate entrada, LocalDate salida) {
+        if (estado == EstadoReserva.CANCELADA || habitacion == null) {
+            return false;
+        }
+        if (!contieneHabitacion(habitacion)) {
+            return false;
+        }
+        // Hay solapamiento de fechas
+        return entrada.isBefore(fechaSalida) && salida.isAfter(fechaEntrada);
+    }
+
+    // Se compara por id porque los objetos que vienen de la BD son instancias distintas
+    private boolean contieneHabitacion(Habitacion habitacion) {
+        for (int i = 0; i < habitaciones.size(); i++) {
+            if (habitaciones.getAt(i).getId() == habitacion.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public String toString() {
         return "Reserva{" +

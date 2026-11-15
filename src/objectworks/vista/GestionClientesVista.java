@@ -2,19 +2,18 @@ package objectworks.vista;
 
 import java.util.Scanner;
 import objectworks.controlador.ClienteController;
-import objectworks.controlador.Controlador;
+import objectworks.controlador.ReservaController;
 import objectworks.modelo.Lista;
 import objectworks.modelo.Reserva;
 
 public class GestionClientesVista {
-    private ClienteController controlador;
-    // TODO Parte 4: cambiar por ReservaController cuando las reservas esten en la BD
-    private Controlador controladorReservas;
+    private ClienteController controladorClientes;
+    private ReservaController controladorReservas;
     private Scanner teclado;
 
-    public GestionClientesVista(ClienteController controlador, Controlador controladorReservas, Scanner teclado) {
-        this.controlador = controlador;
+    public GestionClientesVista(ClienteController controladorClientes, ReservaController controladorReservas, Scanner teclado) {
         this.controladorReservas = controladorReservas;
+        this.controladorClientes = controladorClientes;
         this.teclado = teclado;
     }
 
@@ -47,7 +46,7 @@ public class GestionClientesVista {
 
     private void listar() {
         try {
-            mostrarLista(controlador.listarClientes());
+            mostrarLista(controladorClientes.listarClientes());
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -56,7 +55,7 @@ public class GestionClientesVista {
     private void buscar() {
         String texto = pedir("Nombre o apellido a buscar: ");
         try {
-            mostrarLista(controlador.buscarClientes(texto));
+            mostrarLista(controladorClientes.buscarClientes(texto));
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }
@@ -69,7 +68,7 @@ public class GestionClientesVista {
         String email = pedir("Email: ");
         String telefono = pedir("Telefono: ");
         try {
-            controlador.anadirCliente(dni, nombre, apellidos, email, telefono);
+            controladorClientes.anadirCliente(dni, nombre, apellidos, email, telefono);
             System.out.println("Cliente anadido correctamente");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -79,12 +78,12 @@ public class GestionClientesVista {
     private void modificar() {
         String dni = pedir("DNI del cliente a modificar: ");
         try {
-            System.out.println("Datos actuales: " + controlador.verCliente(dni));
+            System.out.println("Datos actuales: " + controladorClientes.verCliente(dni));
             String nombre = pedir("Nuevo nombre: ");
             String apellidos = pedir("Nuevos apellidos: ");
             String email = pedir("Nuevo email: ");
             String telefono = pedir("Nuevo telefono: ");
-            controlador.modificarCliente(dni, nombre, apellidos, email, telefono);
+            controladorClientes.modificarCliente(dni, nombre, apellidos, email, telefono);
             System.out.println("Cliente modificado correctamente");
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
@@ -94,10 +93,10 @@ public class GestionClientesVista {
     private void eliminar() {
         String dni = pedir("DNI del cliente a eliminar: ");
         try {
-            System.out.println("Vas a eliminar: " + controlador.verCliente(dni));
+            System.out.println("Vas a eliminar: " + controladorClientes.verCliente(dni));
             String confirma = pedir("Seguro? (s/n): ");
             if (confirma.equalsIgnoreCase("s")) {
-                controlador.eliminarCliente(dni);
+                controladorClientes.eliminarCliente(dni);
                 System.out.println("Cliente eliminado");
             } else {
                 System.out.println("Operacion cancelada");
@@ -126,7 +125,7 @@ public class GestionClientesVista {
     public void mostrarListaReservas() {
         String dni = pedir("DNI del cliente: ");
         try {
-            Lista<Reserva> reservas = controladorReservas.listarReservasCliente(dni);
+            Lista<Reserva> reservas = controladorReservas.buscarReservaPorDni(dni);
             if (reservas.isEmpty()) {
                 System.out.println("No hay reservas para este cliente");
             } else {

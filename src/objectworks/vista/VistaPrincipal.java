@@ -2,35 +2,29 @@ package objectworks.vista;
 
 import java.util.Scanner;
 import objectworks.controlador.ClienteController;
-import objectworks.controlador.Controlador;
+import objectworks.controlador.ConsultasController;
 import objectworks.controlador.ReservaController;
 import objectworks.controlador.HabitacionController;
 import objectworks.controlador.HotelController;
-import objectworks.modelo.*;
-import objectworks.modelo.enums.CategoriaHabitacion;
-import objectworks.modelo.exceptions.DatoObligatorioException;
-import objectworks.modelo.exceptions.FechasInvalidasException;
-import objectworks.modelo.exceptions.HotelNoEncontradoException;
-
-import java.time.LocalDate;
 
 public class VistaPrincipal {
     private final ClienteController clienteController;
     private final ReservaController reservaController;
     private final HotelController hotelController;
-    private final HabitacionController habitacionController;ain
-    // TODO: cada parte sustituye este Controlador antiguo por su propio controlador
-    // (ReservaController, ConsultaReservaController)
-    private Controlador controlador;
+    private final HabitacionController habitacionController;
+    private final ConsultasController consultasController;
+
     private Scanner teclado = new Scanner(System.in);
 
 
-    public VistaPrincipal(ClienteController clienteController, ReservaController reservaController, HotelController hotelController, HabitacionController habitacionController) {
+    public VistaPrincipal(ClienteController clienteController, ReservaController reservaController,
+                          HotelController hotelController, HabitacionController habitacionController,
+                          ConsultasController consultasController) {
         this.clienteController = clienteController;
         this.hotelController = hotelController;
         this.habitacionController = habitacionController;
         this.reservaController = reservaController;
-        this.controlador = new Controlador();
+        this.consultasController = consultasController;
     }
 
     public void mostrarErrorConexion() {
@@ -53,15 +47,15 @@ public class VistaPrincipal {
             String opcion = teclado.nextLine();
 
             if (opcion.equals("1")) {
-                new GestionClientesVista(clienteController, controlador, teclado).menu();
+                new GestionClientesVista(clienteController, reservaController, teclado).menu();
             } else if (opcion.equals("2")) {
                 new GestionHotelesVista(hotelController,habitacionController, teclado).menu();
             } else if (opcion.equals("3")) {
                 new GestionHabitacionesVista(habitacionController, teclado).menu();
             } else if (opcion.equals("4")) {
-                new GestionReservasVista(reservaController, clienteController, teclado).menu();
+                new GestionReservasVista(reservaController, clienteController, hotelController, habitacionController, teclado).menu();
             } else if (opcion.equals("5")) {
-                new GestionConsultasVista(controlador, teclado).menu();
+                new GestionConsultasVista(consultasController, teclado).menu();
             } else if (opcion.equals("0")) {
                 salir = true;
             } else {

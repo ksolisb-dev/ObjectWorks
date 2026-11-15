@@ -1,8 +1,6 @@
 package objectworks.vista;
 
-import objectworks.controlador.ClienteController;
-import objectworks.controlador.ReservaController;
-import objectworks.controlador.Controlador;
+import objectworks.controlador.*;
 import objectworks.modelo.Habitacion;
 import objectworks.modelo.Lista;
 import objectworks.modelo.Reserva;
@@ -14,17 +12,22 @@ import java.util.Scanner;
 public class GestionReservasVista {
 
     private final ReservaController reservaController;
-    // Los clientes ya se leen de la BD a traves de su propio controlador
     private final ClienteController clienteController;
+    private final HotelController hotelController;
+    private final HabitacionController habitacionController;
     private final Scanner teclado;
 
     public GestionReservasVista(
             ReservaController reservaController,
             ClienteController clienteController,
+            HotelController hotelController,
+            HabitacionController habitacionController,
             Scanner teclado) {
 
         this.reservaController = reservaController;
         this.clienteController = clienteController;
+        this.hotelController = hotelController;
+        this.habitacionController = habitacionController;
         this.teclado = teclado;
     }
 
@@ -105,7 +108,7 @@ public class GestionReservasVista {
         System.out.println(clienteController.verCliente(dni));
 
         // Seleccionar hotel y fechas.
-        mostrarLista(reservaController.listarHoteles());
+        mostrarLista(hotelController.listarHoteles());
 
         int hotelId = leerEntero("ID del hotel: ");
         LocalDate entrada = leerFecha("Fecha de entrada");
@@ -113,7 +116,7 @@ public class GestionReservasVista {
 
         // Consultar las opciones disponibles.
         Lista<Habitacion> disponibles =
-                reservaController.getHabitacionesDisponibles(
+                habitacionController.buscarDisponiblesPorHotel(
                         hotelId, entrada, salida
                 );
 
@@ -178,7 +181,7 @@ public class GestionReservasVista {
         LocalDate salida = leerFecha("Nueva fecha de salida");
 
         Lista<Habitacion> disponibles =
-                reservaController.habitacionesDisponiblesParaModificar(
+                habitacionController.habitacionesDisponiblesParaModificar(
                         idReserva, entrada, salida
                 );
 
