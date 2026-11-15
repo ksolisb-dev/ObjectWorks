@@ -2,6 +2,7 @@ package objectworks.modelo.dao.mysql;
 
 import objectworks.modelo.dao.ClienteDAO;
 import objectworks.modelo.dao.DAOFactory;
+import objectworks.modelo.dao.HabitacionDAO;
 import objectworks.modelo.dao.HotelDAO;
 import objectworks.modelo.util.ConexionBD;
 
@@ -22,4 +23,7 @@ public class MySQLDAOFactory extends DAOFactory {
     public HotelDAO getHotelDAO() {
         return new MySQLHotelDAO();
     }
+
+    @Override
+    public HabitacionDAO getHabitacionDAO() { return new MySQLHabitacionDAO(); }
 }

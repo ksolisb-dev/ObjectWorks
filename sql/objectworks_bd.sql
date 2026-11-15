@@ -214,6 +214,75 @@ END $$
 
 DELIMITER ;
 
+-- PROCEDIMIENTOS PARTE 3 - HABITACIONES
+-- =====================================================================
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS sp_insertar_habitacion $$
+CREATE PROCEDURE sp_insertar_habitacion(
+    IN p_id_hotel INT UNSIGNED,
+    IN p_numero VARCHAR(10),
+    IN p_planta VARCHAR(10),
+    IN p_capacidad TINYINT UNSIGNED,
+    IN p_categoria VARCHAR(10),
+    IN p_precio_base_noche DECIMAL(8,2),
+    OUT p_id_habitacion INT UNSIGNED
+)
+BEGIN
+INSERT INTO habitacion (id_hotel, numero, planta, capacidad, categoria, precio_base_noche)
+VALUES (p_id_hotel, p_numero, p_planta, p_capacidad, p_categoria, p_precio_base_noche);
+SET p_id_habitacion = LAST_INSERT_ID();
+END $$
+
+DROP PROCEDURE IF EXISTS sp_modificar_habitacion $$
+CREATE PROCEDURE sp_modificar_habitacion(
+    IN p_id_habitacion INT UNSIGNED,
+    IN p_id_hotel INT UNSIGNED,
+    IN p_numero VARCHAR(10),
+    IN p_planta VARCHAR(10),
+    IN p_capacidad TINYINT UNSIGNED,
+    IN p_categoria VARCHAR(10),
+    IN p_precio_base_noche DECIMAL(8,2)
+)
+BEGIN
+    -- Mantiene el hotel de la habitación; no traslada habitaciones con reservas a otro hotel.
+UPDATE habitacion
+SET numero = p_numero,
+    planta = p_planta,
+    capacidad = p_capacidad,
+    categoria = p_categoria,
+    precio_base_noche = p_precio_base_noche
+WHERE id_habitacion = p_id_habitacion AND id_hotel = p_id_hotel;
+
+-- Una actualización sin cambios también es válida si la fila existe.
+IF ROW_COUNT() = 0 AND NOT EXISTS (
+        SELECT 1 FROM habitacion
+         WHERE id_habitacion = p_id_habitacion AND id_hotel = p_id_hotel
+    ) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No existe esa habitacion en el hotel indicado';
+END IF;
+END $$
+
+DROP PROCEDURE IF EXISTS sp_eliminar_habitacion $$
+CREATE PROCEDURE sp_eliminar_habitacion(IN p_id_habitacion INT UNSIGNED)
+BEGIN
+    IF EXISTS (SELECT 1 FROM reserva_habitacion WHERE id_habitacion = p_id_habitacion) THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No se puede eliminar: la habitacion tiene reservas registradas';
+END IF;
+
+DELETE FROM habitacion WHERE id_habitacion = p_id_habitacion;
+IF ROW_COUNT() = 0 THEN
+        SIGNAL SQLSTATE '45000'
+            SET MESSAGE_TEXT = 'No existe la habitacion que se quiere eliminar';
+END IF;
+END $$
+
+DELIMITER ;
+
+
 -- =====================================================================
 -- 4. DATOS DE PRUEBA (los mismos que habia en Datos.java)
 -- =====================================================================
