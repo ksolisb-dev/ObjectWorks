@@ -31,12 +31,13 @@ public interface HabitacionDAO extends  DAO<Habitacion, Integer> {
     Lista<Habitacion> buscarPorHotelNumPersonas(int id_hotel, int personas) throws DAOException;
 
     /** Busca habitaciones disponibles entre 2 fechas. */
-    Lista<Habitacion> buscarPorFecha(LocalDate fechaInicio, LocalDate fechaFin) throws DAOException;
+    Lista<Habitacion> buscarDisponibles(LocalDate fechaInicio, LocalDate fechaFin) throws DAOException;
 
     /** Busca habitaciones disponibles por hotel entre 2 fechas. */
-    Lista<Habitacion> buscarPorFecha(int id_hotel, LocalDate fechaEntrada, LocalDate fechaSalida) throws DAOException;
+    Lista<Habitacion> buscarDisponiblesPorHotel(int id_hotel, LocalDate fechaEntrada, LocalDate fechaSalida) throws DAOException;
 
     /** Excluyen la reserva indicada al consultar disponibilidad por fechas, para cuando hagamos las modificaciones de habitaciones. */
     Lista<Habitacion> buscarDisponibles(LocalDate entrada, LocalDate salida, Integer idReservaIgnorada) throws DAOException;
     Lista<Habitacion> buscarDisponiblesPorHotel(int idHotel, LocalDate entrada, LocalDate salida, Integer idReservaIgnorada) throws DAOException;
+
 }

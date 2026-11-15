@@ -53,9 +53,9 @@ public abstract class Habitacion {
         this.capacidad = capacidad;
     }
 
-    public int getId_hotel() { return id_hotel; }
+    public int getIdHotel() { return id_hotel; }
 
-    public void setId_hotel(int id_hotel) { this.id_hotel = id_hotel; }
+    public void setIdHotel(int id_hotel) { this.id_hotel = id_hotel; }
 
     //Funciones
 
