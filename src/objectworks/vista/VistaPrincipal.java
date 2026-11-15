@@ -3,6 +3,7 @@ package objectworks.vista;
 import java.util.Scanner;
 import objectworks.controlador.ClienteController;
 import objectworks.controlador.Controlador;
+import objectworks.controlador.ReservaController;
 import objectworks.controlador.HabitacionController;
 import objectworks.controlador.HotelController;
 import objectworks.modelo.*;
@@ -15,17 +16,20 @@ import java.time.LocalDate;
 
 public class VistaPrincipal {
     private final ClienteController clienteController;
+    private final ReservaController reservaController;
     private final HotelController hotelController;
-    private final HabitacionController habitacionController;
+    private final HabitacionController habitacionController;ain
     // TODO: cada parte sustituye este Controlador antiguo por su propio controlador
     // (ReservaController, ConsultaReservaController)
     private Controlador controlador;
     private Scanner teclado = new Scanner(System.in);
 
-    public VistaPrincipal(ClienteController clienteController, HotelController hotelController, HabitacionController habitacionController) {
+
+    public VistaPrincipal(ClienteController clienteController, ReservaController reservaController, HotelController hotelController, HabitacionController habitacionController) {
         this.clienteController = clienteController;
         this.hotelController = hotelController;
         this.habitacionController = habitacionController;
+        this.reservaController = reservaController;
         this.controlador = new Controlador();
     }
 
@@ -55,7 +59,7 @@ public class VistaPrincipal {
             } else if (opcion.equals("3")) {
                 new GestionHabitacionesVista(habitacionController, teclado).menu();
             } else if (opcion.equals("4")) {
-                new GestionReservasVista(controlador, clienteController, teclado).menu();
+                new GestionReservasVista(reservaController, clienteController, teclado).menu();
             } else if (opcion.equals("5")) {
                 new GestionConsultasVista(controlador, teclado).menu();
             } else if (opcion.equals("0")) {
