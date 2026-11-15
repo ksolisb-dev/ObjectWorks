@@ -5,7 +5,6 @@ import objectworks.modelo.Habitacion;
 import objectworks.modelo.Hotel;
 import objectworks.modelo.Cliente;
 import objectworks.modelo.Lista;
-import objectworks.modelo.dao.HotelDAO;
 import objectworks.modelo.dao.ReservaDAO;
 import objectworks.modelo.dao.DAOFactory;
 import objectworks.modelo.enums.EstadoReserva;
@@ -17,11 +16,9 @@ import java.time.LocalDate;
 public class ReservaController {
 
     private final ReservaDAO reservaDAO;
-    private final Controlador controladorAntiguo;
 
     public ReservaController(DAOFactory factory) {
         this.reservaDAO = factory.getReservaDAO();
-        this.controladorAntiguo = new Controlador();
     }
 
     public int crearReserva(Reserva reserva) throws DAOException {

@@ -2,7 +2,6 @@ package objectworks.vista;
 
 import java.util.Scanner;
 import objectworks.controlador.ClienteController;
-import objectworks.controlador.Controlador;
 import objectworks.controlador.ReservaController;
 import objectworks.modelo.Lista;
 import objectworks.modelo.Reserva;

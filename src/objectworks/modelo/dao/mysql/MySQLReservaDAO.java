@@ -22,6 +22,10 @@ public class MySQLReservaDAO implements ReservaDAO {
     private static final String SP_MODIFICAR = "{CALL sp_modificar_reserva(?, ?, ?, ?, ?)}";
     private static final String SP_CANCELAR  = "{CALL sp_cancelar_reserva(?)}";
 
+    private static final String SELECT_BASE =
+            "SELECT r.*, c.dni FROM reserva r INNER JOIN cliente c ON r.id_cliente = c.id_cliente ";
+    private static final String ORDEN = " ORDER BY r.fecha_entrada DESC, r.id_reserva";
+
 
 
     // Para los bugs
@@ -110,7 +114,7 @@ public class MySQLReservaDAO implements ReservaDAO {
 
     @Override
     public Reserva buscarPorId(Integer id) throws DAOException {
-        String sql = "SELECT * FROM reserva WHERE id_reserva = ?";
+        String sql = SELECT_BASE + "WHERE r.id_reserva = ?";
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -127,38 +131,32 @@ public class MySQLReservaDAO implements ReservaDAO {
 
     @Override
     public Lista<Reserva> buscarPorDni(String dni) throws DAOException {
-        return listarConSql("SELECT r.* FROM reserva r INNER JOIN cliente c ON r.id_cliente=c.id_cliente WHERE dni = " + dni);
+        return listarConParametros(SELECT_BASE + "WHERE c.dni = ?" + ORDEN, dni);
     }
 
     @Override
     public Lista<Reserva> listarTodos() throws DAOException {
-        return listarConSql("SELECT * FROM reserva ORDER BY fecha_entrada DESC");
-    }
-    @Override
-    public Lista<Reserva> listarPorCliente(int idCliente) throws DAOException {
-        return listarConSql("SELECT * FROM reserva WHERE id_cliente = " + idCliente); // mejor con PreparedStatement, lo dejo simple
+        return listarConParametros(SELECT_BASE + ORDEN);
     }
 
     @Override
     public Lista<Reserva> listarPorHotel(int idHotel) throws DAOException {
-        return listarConSql("SELECT * FROM reserva WHERE id_hotel = " + idHotel);
+        return listarConParametros(SELECT_BASE + "WHERE r.id_hotel = ?" + ORDEN, idHotel);
     }
+
     @Override
-    public Lista<Reserva> listarPorFechas(LocalDate desde, LocalDate hasta) throws DAOException {
-        String sql = "SELECT * FROM reserva WHERE fecha_entrada >= ? AND fecha_salida <= ?";
-        try (Connection con = ConexionBD.getConexion();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setDate(1, Date.valueOf(desde));
-            ps.setDate(2, Date.valueOf(hasta));
-            return leerVarios(ps);
-        } catch (SQLException e) {
-            throw new DAOException("Error al listar reservas por fechas", e);
-        }
+    public Lista<Reserva> listarPorFechaEntrada(LocalDate fecha) throws DAOException {
+        return listarConParametros(SELECT_BASE + "WHERE r.fecha_entrada = ?" + ORDEN, Date.valueOf(fecha));
+    }
+
+    @Override
+    public Lista<Reserva> listarPorFechaSalida(LocalDate fecha) throws DAOException {
+        return listarConParametros(SELECT_BASE + "WHERE r.fecha_salida = ?" + ORDEN, Date.valueOf(fecha));
     }
 
     @Override
     public Lista<Reserva> listarPorEstado(EstadoReserva estado) throws DAOException {
-        return listarConSql("SELECT * FROM reserva WHERE estado = '" + estado.name() + "'");
+        return listarConParametros(SELECT_BASE + "WHERE r.estado = ?" + ORDEN, estado.name());
     }
 
     private void insertarHabitaciones(Connection con, int idReserva, Lista<Habitacion> habitaciones) throws SQLException {
@@ -178,9 +176,13 @@ public class MySQLReservaDAO implements ReservaDAO {
             ps.executeUpdate();
         }
     }
-    private Lista<Reserva> listarConSql(String sql) throws DAOException {
+
+    private Lista<Reserva> listarConParametros(String sql, Object... parametros) throws DAOException {
         try (Connection con = ConexionBD.getConexion();
              PreparedStatement ps = con.prepareStatement(sql)) {
+            for (int i = 0; i < parametros.length; i++) {
+                ps.setObject(i + 1, parametros[i]);
+            }
             return leerVarios(ps);
         } catch (SQLException e) {
             throw new DAOException("Error al listar reservas", e);
@@ -202,7 +204,6 @@ public class MySQLReservaDAO implements ReservaDAO {
     }
 
 
-    // PARTE 5 - Esto puedes tener que cambiarlo!!!!!
     private Reserva mapearBasico(ResultSet rs) throws SQLException {
         Reserva r = new Reserva(
                 rs.getInt("id_reserva"),
@@ -211,11 +212,24 @@ public class MySQLReservaDAO implements ReservaDAO {
                 rs.getInt("num_personas"),
                 rs.getDate("fecha_creacion").toLocalDate(),
                 EstadoReserva.valueOf(rs.getString("estado")),
-                null,   // Hotel (se puede cargar después)
-                null,   // Cliente
+                hotelSoloId(rs.getInt("id_hotel")),
+                clienteSoloIdYDni(rs.getInt("id_cliente"), rs.getString("dni")),
                 new Lista<>()
         );
         return r;
+    }
+
+    // Hotel "ligero": solo con el id, suficiente para mostrar y consultar la reserva
+    private Hotel hotelSoloId(int idHotel) {
+        return new Hotel(idHotel, "", "", "", 0, "");
+    }
+
+    // Cliente "ligero": id y DNI, que es lo que se muestra en las consultas
+    private Cliente clienteSoloIdYDni(int idCliente, String dni) {
+        Cliente c = new Cliente();
+        c.setId(idCliente);
+        c.setDni(dni);
+        return c;
     }
 
     private DAOException traducir(String contexto, SQLException e) {

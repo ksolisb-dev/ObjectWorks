@@ -1,18 +1,20 @@
 package objectworks.vista;
 
-import objectworks.controlador.Controlador;
-import objectworks.modelo.*;
+import objectworks.controlador.ConsultasController;
+import objectworks.modelo.Lista;
 import objectworks.modelo.enums.EstadoReserva;
 import objectworks.modelo.Reserva;
+import objectworks.modelo.exceptions.DAOException;
+import objectworks.modelo.exceptions.DatoObligatorioException;
+
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Scanner;
 
 public class GestionConsultasVista {
-    private Controlador controlador;
-    private Scanner teclado;
+    private final ConsultasController controlador;
+    private final Scanner teclado;
 
-    public GestionConsultasVista(Controlador controlador, Scanner teclado) {
+    public GestionConsultasVista(ConsultasController controlador, Scanner teclado) {
         this.controlador = controlador;
         this.teclado = teclado;
     }
@@ -72,33 +74,33 @@ public class GestionConsultasVista {
         }
     }
 
-    private void buscarPorCliente() {
+    private void buscarPorCliente() throws Exception {
         String dni = pedir("DNI del cliente: ");
         mostrarLista(controlador.buscarReservasPorCliente(dni));
     }
 
-    private void buscarPorHotel() {
-        int id = Integer.parseInt(pedir("Id del hotel: "));
+    private void buscarPorHotel() throws Exception {
+        int id = Integer.parseInt(pedir("Id del hotel: ").trim());
         mostrarLista(controlador.buscarReservasPorHotel(id));
     }
 
-    private void buscarPorFechaEntrada() {
-        LocalDate fecha = LocalDate.parse(pedir("Fecha entrada (yyyy-MM-dd): "));
+    private void buscarPorFechaEntrada() throws DatoObligatorioException, DAOException {
+        LocalDate fecha = LocalDate.parse(pedir("Fecha entrada (yyyy-MM-dd): ").trim());
         mostrarLista(controlador.buscarReservasPorFechaEntrada(fecha));
     }
 
-    private void buscarPorFechaSalida() {
-        LocalDate fecha = LocalDate.parse(pedir("Fecha Salida (yyyy-MM-dd): "));
+    private void buscarPorFechaSalida() throws DatoObligatorioException, DAOException {
+        LocalDate fecha = LocalDate.parse(pedir("Fecha Salida (yyyy-MM-dd): ").trim());
         mostrarLista(controlador.buscarReservasPorFechaSalida(fecha));
     }
 
-    private void buscarPorEstado() {
+    private void buscarPorEstado() throws DatoObligatorioException, DAOException {
         System.out.println("Estados disponibles: ");
         System.out.println("1. CONFIRMADA");
         System.out.println("2. CANCELADA");
         System.out.println("3. FINALIZADA");
 
-        int opcionEstado = Integer.parseInt(pedir("Elige el estado: "));
+        int opcionEstado = Integer.parseInt(pedir("Elige el estado: ").trim());
 
         if (opcionEstado < 1 || opcionEstado > EstadoReserva.values().length) {
             System.out.println("Estado no valido");
@@ -114,7 +116,7 @@ public class GestionConsultasVista {
         mostrarLista(controlador.buscarReservasPorEstado(estado));
     }
 
-    private void mostrarTodasLasReservas() {
+    private void mostrarTodasLasReservas() throws DAOException {
         mostrarLista(controlador.listarTodasLasReservas());
     }
 }
