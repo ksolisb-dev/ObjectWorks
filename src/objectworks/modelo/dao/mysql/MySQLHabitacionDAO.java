@@ -29,7 +29,7 @@ public class MySQLHabitacionDAO implements HabitacionDAO {
     // Secuencia de selección básica de una habitación
     private static final String SELECT_BASE =
             "SELECT id_habitacion, numero, planta, capacidad, categoria, precio_base_noche" +
-                    " FROM habitacion";
+                    " FROM habitacion h";
 
     // Secuencias base para la gestión de una habitación
     private static final String SQL_INSERT =
@@ -42,22 +42,22 @@ public class MySQLHabitacionDAO implements HabitacionDAO {
     // Secuencias de las funciones requeridas para las habitaciones
 
     /** Devuelve las habitaciones de ese hotel o lista vacía si no tiene. */
-    private static final String SQL_LISTAR= SELECT_BASE + " WHERE id_hotel=? ORDER BY numero";
+    private static final String SQL_LISTAR= SELECT_BASE + " WHERE h.id_hotel=? ORDER BY h.numero";
 
     /** Busca habitaciones por categoria. */
-    private static final String SQL_HAB_CATEGORIA = SELECT_BASE + " WHERE categoria=? ORDER BY id_habitacion";
+    private static final String SQL_HAB_CATEGORIA = SELECT_BASE + " WHERE h.categoria=? ORDER BY h.id_habitacion";
 
     /** Busca habitaciones por hotel y por categoria. */
-    private static final String SQL_HAB_HOT_CATEGORIA = SELECT_BASE + " WHERE id_hotel=? AND categoria=? ORDER BY id_habitacion";
+    private static final String SQL_HAB_HOT_CATEGORIA = SELECT_BASE + " WHERE h.id_hotel=? AND h.categoria=? ORDER BY h.id_habitacion";
 
     /** Busca habitaciones por número de personas. */
-    private static final String SQL_HAB_NPERS = SELECT_BASE + " WHERE capacidad>=? ORDER BY id_habitacion";
+    private static final String SQL_HAB_NPERS = SELECT_BASE + " WHERE h.capacidad>=? ORDER BY h.id_habitacion";
 
     /** Busca habitaciones por hotel y por número de personas. */
-    private static final String SQL_HAB_HOT_NPERS = SELECT_BASE + " WHERE capacidad>=? AND id_hotel=? ORDER BY numero";
+    private static final String SQL_HAB_HOT_NPERS = SELECT_BASE + " WHERE h.capacidad>=? AND h.id_hotel=? ORDER BY h.numero";
 
     /** Busca habitaciones disponibles entre 2 fechas. */
-    private static final String SQL_HAB_DISPO = SELECT_BASE + " WHERE disponibilidad=? ORDER BY id_habitacion"; // Vamos a tener que añadir o buscar si existe algun métod0 para verificar si esta disponible o no la habitación
+    private static final String SQL_HAB_DISPO = SELECT_BASE + " WHERE h.disponibilidad=? ORDER BY id_habitacion"; // Vamos a tener que añadir o buscar si existe algun métod0 para verificar si esta disponible o no la habitación
 
     /** Busca habitaciones disponibles por hotel entre 2 fechas. */
     private static final String SQL_HAB_HOT_DISPO = SELECT_BASE + " WHERE disponibilidad=? AND id_hotel=? ORDER BY id_habitacion"; // Vamos a tener que añadir o buscar si existe algun métod0 para verificar si esta disponible o no la habitación
