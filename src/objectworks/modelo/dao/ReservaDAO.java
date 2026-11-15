@@ -13,6 +13,7 @@ import java.time.LocalDate;
 public interface ReservaDAO extends DAO<Reserva, Integer> {
     // Creo que asi basta
     void cancelar(int idReserva) throws DAOException;
+    Lista<Reserva> buscarPorDni(String dni) throws DAOException;
 
 
 

@@ -124,6 +124,12 @@ public class MySQLReservaDAO implements ReservaDAO {
             throw new DAOException("Error al buscar la reserva", e);
         }
     }
+
+    @Override
+    public Lista<Reserva> buscarPorDni(String dni) throws DAOException {
+        return listarConSql("SELECT r.* FROM reserva r INNER JOIN cliente c ON r.id_cliente=c.id_cliente WHERE dni = " + dni);
+    }
+
     @Override
     public Lista<Reserva> listarTodos() throws DAOException {
         return listarConSql("SELECT * FROM reserva ORDER BY fecha_entrada DESC");

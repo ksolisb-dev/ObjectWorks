@@ -5,6 +5,7 @@ import objectworks.modelo.Habitacion;
 import objectworks.modelo.Hotel;
 import objectworks.modelo.Cliente;
 import objectworks.modelo.Lista;
+import objectworks.modelo.dao.HotelDAO;
 import objectworks.modelo.dao.ReservaDAO;
 import objectworks.modelo.dao.DAOFactory;
 import objectworks.modelo.enums.EstadoReserva;
@@ -17,9 +18,6 @@ public class ReservaController {
 
     private final ReservaDAO reservaDAO;
     private final Controlador controladorAntiguo;
-
-
-
 
     public ReservaController(DAOFactory factory) {
         this.reservaDAO = factory.getReservaDAO();
@@ -42,13 +40,11 @@ public class ReservaController {
         }
         reservaDAO.cancelar(idReserva);
     }
+
     public Reserva buscarPorId(int id) throws DAOException {
         return reservaDAO.buscarPorId(id);
     }
 
-
-
-    // PARTE 5  - creo que esto lo tendras que usar
     public Lista<Reserva> listarTodas() throws DAOException {
         return reservaDAO.listarTodos();
     }
@@ -57,25 +53,18 @@ public class ReservaController {
         return reservaDAO.listarTodos();
     }
 
-    public Lista<Hotel> listarHoteles() {
-        return controladorAntiguo.listarHoteles();
-    }
-
-    public Lista<Habitacion> getHabitacionesDisponibles(int hotelId, LocalDate entrada, LocalDate salida)
-            throws Exception {
-        return controladorAntiguo.getHabitacionesDisponibles(hotelId, entrada, salida);
-    }
-
-    public Lista<Habitacion> habitacionesDisponiblesParaModificar(int idReserva, LocalDate entrada, LocalDate salida)
-            throws Exception {
-        Reserva r = buscarReservaPorId(idReserva);
-        return controladorAntiguo.getHabitacionesDisponibles(r.getHotel().getId(), entrada, salida);
-    }
-
     public Reserva buscarReservaPorId(int idReserva) throws DAOException, ReservaNoEncontradaException {
         Reserva r = reservaDAO.buscarPorId(idReserva);
         if (r == null) {
             throw new ReservaNoEncontradaException("No existe la reserva con id " + idReserva);
+        }
+        return r;
+    }
+
+    public Lista<Reserva> buscarReservaPorDni(String dni) throws DAOException, ReservaNoEncontradaException {
+        Lista<Reserva> r = reservaDAO.buscarPorDni(dni);
+        if (r == null) {
+            throw new ReservaNoEncontradaException("No existe la reserva con dni " + dni);
         }
         return r;
     }

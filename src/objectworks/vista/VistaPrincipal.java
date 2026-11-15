@@ -18,9 +18,8 @@ public class VistaPrincipal {
     private final ClienteController clienteController;
     private final ReservaController reservaController;
     private final HotelController hotelController;
-    private final HabitacionController habitacionController;ain
-    // TODO: cada parte sustituye este Controlador antiguo por su propio controlador
-    // (ReservaController, ConsultaReservaController)
+    private final HabitacionController habitacionController;
+
     private Controlador controlador;
     private Scanner teclado = new Scanner(System.in);
 
@@ -53,13 +52,13 @@ public class VistaPrincipal {
             String opcion = teclado.nextLine();
 
             if (opcion.equals("1")) {
-                new GestionClientesVista(clienteController, controlador, teclado).menu();
+                new GestionClientesVista(clienteController, reservaController, teclado).menu();
             } else if (opcion.equals("2")) {
                 new GestionHotelesVista(hotelController,habitacionController, teclado).menu();
             } else if (opcion.equals("3")) {
                 new GestionHabitacionesVista(habitacionController, teclado).menu();
             } else if (opcion.equals("4")) {
-                new GestionReservasVista(reservaController, clienteController, teclado).menu();
+                new GestionReservasVista(reservaController, clienteController, hotelController, habitacionController, teclado).menu();
             } else if (opcion.equals("5")) {
                 new GestionConsultasVista(controlador, teclado).menu();
             } else if (opcion.equals("0")) {
