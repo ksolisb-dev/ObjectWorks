@@ -5,9 +5,11 @@ import objectworks.modelo.Habitacion;
 import objectworks.modelo.Hotel;
 import objectworks.modelo.Cliente;
 import objectworks.modelo.Lista;
+import objectworks.modelo.dao.ClienteDAO;
 import objectworks.modelo.dao.ReservaDAO;
 import objectworks.modelo.dao.DAOFactory;
 import objectworks.modelo.enums.EstadoReserva;
+import objectworks.modelo.exceptions.ClienteNoEncontradoException;
 import objectworks.modelo.exceptions.DAOException;
 import objectworks.modelo.exceptions.ReservaNoEncontradaException;
 
@@ -16,9 +18,11 @@ import java.time.LocalDate;
 public class ReservaController {
 
     private final ReservaDAO reservaDAO;
+    private final ClienteDAO clienteDAO;
 
     public ReservaController(DAOFactory factory) {
         this.reservaDAO = factory.getReservaDAO();
+        this.clienteDAO = factory.getClienteDAO();
     }
 
     public int crearReserva(Reserva reserva) throws DAOException {
@@ -69,8 +73,12 @@ public class ReservaController {
     public Reserva crearReserva(String dni, int hotelId, LocalDate entrada, LocalDate salida,
                                 int numPersonas, Lista<Habitacion> habitaciones) throws DAOException, Exception {
 
-        Cliente cliente = new Cliente();
-        cliente.setDni(dni);
+        // Hace falta el cliente real: la reserva se guarda con su id_cliente (FK), no con el DNI
+        String dniNormalizado = dni == null ? "" : dni.trim().toUpperCase();
+        Cliente cliente = clienteDAO.buscarPorDni(dniNormalizado);
+        if (cliente == null) {
+            throw new ClienteNoEncontradoException("No existe ningun cliente con DNI " + dniNormalizado);
+        }
 
         Hotel hotel = new Hotel(hotelId, "", "", "", 0, "");
 

@@ -64,7 +64,7 @@ public class MySQLHabitacionDAO implements HabitacionDAO {
     private static final String SQL_HAB_NPERS = SELECT_BASE + " WHERE h.capacidad>=? ORDER BY h.id_habitacion";
 
     /** Busca habitaciones por hotel y por número de personas. */
-    private static final String SQL_HAB_HOT_NPERS = SELECT_BASE + " WHERE h.capacidad>=? AND h.id_hotel=? ORDER BY h.numero";
+    private static final String SQL_HAB_HOT_NPERS = SELECT_BASE + " WHERE h.id_hotel=? AND h.capacidad>=? ORDER BY h.numero";
 
     /** Comprueba si existe solapamiento
      * este definidio:
