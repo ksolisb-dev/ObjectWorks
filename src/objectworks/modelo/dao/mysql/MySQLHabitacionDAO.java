@@ -29,7 +29,7 @@ public class MySQLHabitacionDAO implements HabitacionDAO {
     // Secuencia de selección básica de una habitación
     private static final String SELECT_BASE =
             "SELECT id_habitacion, numero, planta, capacidad, categoria, precio_base_noche" +
-                    "FROM habitacion";
+                    " FROM habitacion";
 
     // Secuencias base para la gestión de una habitación
     private static final String SQL_INSERT =
@@ -42,25 +42,25 @@ public class MySQLHabitacionDAO implements HabitacionDAO {
     // Secuencias de las funciones requeridas para las habitaciones
 
     /** Devuelve las habitaciones de ese hotel o lista vacía si no tiene. */
-    private static final String SQL_LISTAR= SELECT_BASE + "WHERE id_hotel=?" + "ORDER BY numero";
+    private static final String SQL_LISTAR= SELECT_BASE + " WHERE id_hotel=? ORDER BY numero";
 
     /** Busca habitaciones por categoria. */
-    private static final String SQL_HAB_CATEGORIA = SELECT_BASE + "WHERE categoria=?" + "ORDER BY id_habitacion";
+    private static final String SQL_HAB_CATEGORIA = SELECT_BASE + " WHERE categoria=? ORDER BY id_habitacion";
 
     /** Busca habitaciones por hotel y por categoria. */
-    private static final String SQL_HAB_HOT_CATEGORIA = SELECT_BASE + "WHERE categoria=?, id_hotel=?" + "ORDER BY id_habitacion";
+    private static final String SQL_HAB_HOT_CATEGORIA = SELECT_BASE + " WHERE id_hotel=? AND categoria=? ORDER BY id_habitacion";
 
     /** Busca habitaciones por número de personas. */
-    private static final String SQL_HAB_NPERS = SELECT_BASE + "WHERE capacidad=?" + "ORDER BY id_habitacion";
+    private static final String SQL_HAB_NPERS = SELECT_BASE + " WHERE capacidad>=? ORDER BY id_habitacion";
 
     /** Busca habitaciones por hotel y por número de personas. */
-    private static final String SQL_HAB_HOT_NPERS = SELECT_BASE + "WHERE capacidad=?, id_hotel=?" + "ORDER BY numero";
+    private static final String SQL_HAB_HOT_NPERS = SELECT_BASE + " WHERE capacidad>=? AND id_hotel=? ORDER BY numero";
 
     /** Busca habitaciones disponibles entre 2 fechas. */
-    private static final String SQL_HAB_DISPO = SELECT_BASE + "WHERE disponibilidad=?" + "ORDER BY id_habitacion"; // Vamos a tener que añadir o buscar si existe algun métod0 para verificar si esta disponible o no la habitación
+    private static final String SQL_HAB_DISPO = SELECT_BASE + " WHERE disponibilidad=? ORDER BY id_habitacion"; // Vamos a tener que añadir o buscar si existe algun métod0 para verificar si esta disponible o no la habitación
 
     /** Busca habitaciones disponibles por hotel entre 2 fechas. */
-    private static final String SQL_HAB_HOT_DISPO = SELECT_BASE + "WHERE disponibilidad=?, id_hotel=?" + "ORDER BY id_habitacion"; // Vamos a tener que añadir o buscar si existe algun métod0 para verificar si esta disponible o no la habitación
+    private static final String SQL_HAB_HOT_DISPO = SELECT_BASE + " WHERE disponibilidad=? AND id_hotel=? ORDER BY id_habitacion"; // Vamos a tener que añadir o buscar si existe algun métod0 para verificar si esta disponible o no la habitación
 
 
     // SECUENCIAS BASE (Insert, Update, Delete)
@@ -137,14 +137,88 @@ public class MySQLHabitacionDAO implements HabitacionDAO {
     // METOD0S PARA LA GESTIÓN DE LAS HABITACIONES
 
     /** Devuelve las habitaciones de ese hotel o lista vacía si no tiene. */
-    public Lista<Habitacion> obtenerHabitaciones(Integer id) throws DAOException {
+    @Override
+    public Lista<Habitacion> buscarPorHotel(int idHotel) throws DAOException {
         try (Connection con = ConexionBD.getConexion();
-            PreparedStatement ps = con.prepareStatement(SQL_LISTAR);
-            ResultSet rs = ps.executeQuery()) {
-            return
+             PreparedStatement ps = con.prepareStatement(SQL_LISTAR)) {
+             ps.setInt(1, idHotel);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return leerHab(rs);
+            }
+
+        } catch (SQLException e) {
+            throw new DAOException(
+                    "Error al consultar las habitaciones del hotel " + idHotel,
+                    e);
         }
     }
 
+    /** Busca habitaciones por categoria. */
+    public Lista<Habitacion> habitacionesPorCategoria(Integer id) throws DAOException {
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(SQL_HAB_CATEGORIA);
+             ResultSet rs = ps.executeQuery()) {
+            return leerHab(rs);
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener la habitacion/es", e);
+        }
+    }
+
+    /** Busca habitaciones por hotel y por categoria. */
+    public Lista<Habitacion> habitacionesPorHotelCategoria(Integer id) throws DAOException {
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(SQL_HAB_HOT_CATEGORIA);
+             ResultSet rs = ps.executeQuery()) {
+            return leerHab(rs);
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener la habitacion/es", e);
+        }
+    }
+
+    /** Busca habitaciones por número de personas. */
+    public Lista<Habitacion> habitacionesPorNPers(Integer id) throws DAOException {
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(SQL_HAB_NPERS);
+             ResultSet rs = ps.executeQuery()) {
+            return leerHab(rs);
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener la habitacion/es", e);
+        }
+    }
+
+    /** Busca habitaciones por hotel y por número de personas. */
+    public Lista<Habitacion> habitacionesPorHotelNPers(Integer id) throws DAOException {
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(SQL_HAB_HOT_NPERS);
+             ResultSet rs = ps.executeQuery()) {
+            return leerHab(rs);
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener la habitacion/es", e);
+        }
+    }
+
+    /** Busca habitaciones disponibles entre 2 fechas. */
+    public Lista<Habitacion> habitacionesPorFechas(Integer id) throws DAOException {
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(SQL_HAB_DISPO);
+             ResultSet rs = ps.executeQuery()) {
+            return leerHab(rs);
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener la habitacion/es", e);
+        }
+    }
+
+    /** Busca habitaciones disponibles por hotel entre 2 fechas. */
+    public Lista<Habitacion> habitacionesPorHotelFechas(Integer id) throws DAOException {
+        try (Connection con = ConexionBD.getConexion();
+             PreparedStatement ps = con.prepareStatement(SQL_HAB_HOT_DISPO);
+             ResultSet rs = ps.executeQuery()) {
+            return leerHab(rs);
+        } catch (SQLException e) {
+            throw new DAOException("Error al obtener la habitacion/es", e);
+        }
+    }
 
     // FUNCIONES AUXILIARES
 
@@ -167,10 +241,7 @@ public class MySQLHabitacionDAO implements HabitacionDAO {
                 rs.getObject("categoria"), // No se que debo callear en categoria si getObject, getClass o que.
                 rs.getDouble("precio_base_noche")
         ) {
-            @Override
-            public CategoriaHabitacion getCategoria() {
-                return null;
-            }
+
         };
     }
 }

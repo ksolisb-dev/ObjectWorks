@@ -18,7 +18,7 @@ public abstract class DAOFactory {
 
     public abstract ClienteDAO getClienteDAO();
     public abstract HotelDAO getHotelDAO();
-    public abstract HabitacionDAO getHabitacionDAO();  // Parte 3
+    public abstract HabitacionDAO getHabitacionDAO();
     // public abstract ReservaDAO getReservaDAO();        // Parte 4
 
     /** Comprueba que el almacen de datos esta disponible. */

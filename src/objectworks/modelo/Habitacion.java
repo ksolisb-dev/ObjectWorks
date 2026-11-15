@@ -3,6 +3,7 @@ package objectworks.modelo;
 import objectworks.modelo.enums.CategoriaHabitacion;
 
 public abstract class Habitacion {
+    private int id_hotel;
     private int id;
     private String numero;
     private String planta;
@@ -51,6 +52,10 @@ public abstract class Habitacion {
     public void setCapacidad(int capacidad) {
         this.capacidad = capacidad;
     }
+
+    public int getId_hotel() { return id_hotel; }
+
+    public void setId_hotel(int id_hotel) { this.id_hotel = id_hotel; }
 
     //Funciones
 
