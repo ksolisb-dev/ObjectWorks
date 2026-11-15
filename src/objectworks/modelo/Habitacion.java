@@ -3,6 +3,7 @@ package objectworks.modelo;
 import objectworks.modelo.enums.CategoriaHabitacion;
 
 public abstract class Habitacion {
+    private int id_hotel;
     private int id;
     private String numero;
     private String planta;
@@ -10,10 +11,10 @@ public abstract class Habitacion {
     protected double precioBaseNoche; // Si no le pongo protected no me lo deja usar
     // Como es un cambio de ultima hora no estoy muy seguro si esto iba aquí, pero juraría que si
 
-    public Habitacion(int id, String nombre, String planta,
+    public Habitacion(int id, String numero, String planta,
                       int capacidad) {
         this.id = id;
-        this.numero = nombre;
+        this.numero = numero;
         this.planta = planta;
         this.capacidad = capacidad;
     }
@@ -51,6 +52,10 @@ public abstract class Habitacion {
     public void setCapacidad(int capacidad) {
         this.capacidad = capacidad;
     }
+
+    public int getIdHotel() { return id_hotel; }
+
+    public void setIdHotel(int id_hotel) { this.id_hotel = id_hotel; }
 
     //Funciones
 

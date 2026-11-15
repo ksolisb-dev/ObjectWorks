@@ -1,5 +1,0 @@
-# Copia este fichero en la misma carpeta con el nombre "db.properties"
-# y pon tu usuario y contrasena de MySQL. db.properties no se sube a GitHub.
-db.url=jdbc:mysql://localhost:3306/objectworks?serverTimezone=Europe/Madrid
-db.usuario=root
-db.password=TU_CONTRASENA

@@ -2,6 +2,8 @@ package objectworks;
 
 import objectworks.controlador.ClienteController;
 import objectworks.controlador.ReservaController;
+import objectworks.controlador.HabitacionController;
+import objectworks.controlador.HotelController;
 import objectworks.modelo.dao.DAOFactory;
 import objectworks.vista.VistaPrincipal;
 
@@ -15,6 +17,10 @@ public class Main {
         ReservaController reservaController = new ReservaController(factory);
 
         VistaPrincipal vista = new VistaPrincipal(clienteController, reservaController);
+        HotelController hotelController = new HotelController(factory);
+        HabitacionController habitacionController = new HabitacionController(factory);
+
+        VistaPrincipal vista = new VistaPrincipal(clienteController, reservaController, hotelController, habitacionController);
         if (!factory.probarConexion()) {
             vista.mostrarErrorConexion();
             return;

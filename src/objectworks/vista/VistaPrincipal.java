@@ -4,6 +4,8 @@ import java.util.Scanner;
 import objectworks.controlador.ClienteController;
 import objectworks.controlador.Controlador;
 import objectworks.controlador.ReservaController;
+import objectworks.controlador.HabitacionController;
+import objectworks.controlador.HotelController;
 import objectworks.modelo.*;
 import objectworks.modelo.enums.CategoriaHabitacion;
 import objectworks.modelo.exceptions.DatoObligatorioException;
@@ -15,13 +17,18 @@ import java.time.LocalDate;
 public class VistaPrincipal {
     private final ClienteController clienteController;
     private final ReservaController reservaController;
+    private final HotelController hotelController;
+    private final HabitacionController habitacionController;ain
     // TODO: cada parte sustituye este Controlador antiguo por su propio controlador
-    // (HotelController, HabitacionController, ReservaController, ConsultaReservaController)
+    // (ReservaController, ConsultaReservaController)
     private Controlador controlador;
     private Scanner teclado = new Scanner(System.in);
 
-    public VistaPrincipal(ClienteController clienteController, ReservaController reservaController) {
+
+    public VistaPrincipal(ClienteController clienteController, ReservaController reservaController, HotelController hotelController, HabitacionController habitacionController) {
         this.clienteController = clienteController;
+        this.hotelController = hotelController;
+        this.habitacionController = habitacionController;
         this.reservaController = reservaController;
         this.controlador = new Controlador();
     }
@@ -48,9 +55,9 @@ public class VistaPrincipal {
             if (opcion.equals("1")) {
                 new GestionClientesVista(clienteController, controlador, teclado).menu();
             } else if (opcion.equals("2")) {
-                new GestionHotelesVista(controlador, teclado).menu();
+                new GestionHotelesVista(hotelController,habitacionController, teclado).menu();
             } else if (opcion.equals("3")) {
-                new GestionHabitacionesVista(controlador, teclado).menu();
+                new GestionHabitacionesVista(habitacionController, teclado).menu();
             } else if (opcion.equals("4")) {
                 new GestionReservasVista(reservaController, clienteController, teclado).menu();
             } else if (opcion.equals("5")) {
