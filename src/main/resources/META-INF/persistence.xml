@@ -6,11 +6,6 @@
     <persistence-unit name="objectworksPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <properties>
-            <!--Configuración de la conexión a MySQL-->
-            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/objectworks?serverTimezone=Europe/Madrid"/>
-            <property name="jakarta.persistence.jdbc.user" value="root"/>
-            <property name="jakarta.persistence.jdbc.password" value="1234"/>
 
             <!--Mostrar el SQL que genera Hibernate en la consola y que resulta útil para realizar depuraciones-->
             <property name="hibernate.show_sql" value="true"/>

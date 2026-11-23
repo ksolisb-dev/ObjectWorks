@@ -27,3 +27,10 @@ db.properties
 
 # Carpeta de compilacion de IntelliJ
 out/
+
+#Archivos de configuración de IntelliJ
+.idea/
+*.iml
+
+#Carpeta de compilacion de Maven
+target/
