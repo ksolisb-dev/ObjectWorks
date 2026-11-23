@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <persistence xmlns="https://jakarta.ee/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persitence/persistence_3_0.xsd"
+             xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_0.xsd"
              version="3.0">
     <persistence-unit name="objectworksPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
@@ -11,11 +11,11 @@
             <property name="jakarta.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/objectworks?serverTimezone=Europe/Madrid"/>
             <property name="jakarta.persistence.jdbc.user" value="root"/>
             <property name="jakarta.persistence.jdbc.password" value="1234"/>
-            
+
             <!--Mostrar el SQL que genera Hibernate en la consola y que resulta útil para realizar depuraciones-->
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
-            
+
             <!--Configuramos para que Hibernate no borre ni realice modificaciones en la estructura de las tablas sin avisar-->
             <property name="hibernate.hbm2ddl.auto" value="update"/>
         </properties>
