@@ -1,5 +1,6 @@
 package objectworks.modelo.dao;
 
+import objectworks.modelo.dao.jpa.JPADAOFactory;
 import objectworks.modelo.dao.mysql.MySQLDAOFactory;
 
 /**
@@ -14,7 +15,8 @@ import objectworks.modelo.dao.mysql.MySQLDAOFactory;
  */
 public abstract class DAOFactory {
 
-    public static final int MYSQL = 1;
+    public static final int MYSQL = 1;   // JDBC (Producto 3)
+    public static final int JPA = 2;     // ORM con JPA + Hibernate (Producto 4)
 
     public abstract ClienteDAO getClienteDAO();
     // public abstract HotelDAO getHotelDAO();            // Parte 2
@@ -27,11 +29,17 @@ public abstract class DAOFactory {
     /** Comprueba que el almacen de datos esta disponible. */
     public abstract boolean probarConexion();
 
+    /** Libera los recursos al salir de la aplicacion (JPA cierra su EntityManagerFactory). */
+    public void cerrar() {
+    }
+
     /** Devuelve la fabrica concreta para el tipo de base de datos indicado. */
     public static DAOFactory getDAOFactory(int tipo) {
         switch (tipo) {
             case MYSQL:
                 return new MySQLDAOFactory();
+            case JPA:
+                return new JPADAOFactory();
             default:
                 throw new IllegalArgumentException("Tipo de base de datos no soportado: " + tipo);
         }

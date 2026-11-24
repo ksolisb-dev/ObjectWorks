@@ -5,14 +5,25 @@
              version="3.0">
     <persistence-unit name="objectworksPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+
+        <!-- Entidades mapeadas (cada parte anade aqui las suyas) -->
+        <class>objectworks.modelo.Cliente</class>
+        <class>objectworks.modelo.Hotel</class>
+        <class>objectworks.modelo.Habitacion</class>
+        <class>objectworks.modelo.HabitacionEstandar</class>
+        <class>objectworks.modelo.HabitacionSuperior</class>
+        <class>objectworks.modelo.Suite</class>
+
         <properties>
+            <!-- La URL, el usuario y la contrasena los pone JPAUtil leyendo db.properties -->
 
             <!--Mostrar el SQL que genera Hibernate en la consola y que resulta útil para realizar depuraciones-->
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
 
-            <!--Configuramos para que Hibernate no borre ni realice modificaciones en la estructura de las tablas sin avisar-->
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <!--Las tablas las crea sql/objectworks_bd.sql: Hibernate no debe crear ni modificar
+                la estructura ("update" si la modificaria, por eso usamos "none")-->
+            <property name="hibernate.hbm2ddl.auto" value="none"/>
         </properties>
     </persistence-unit>
 </persistence>
