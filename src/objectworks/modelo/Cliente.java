@@ -3,7 +3,7 @@ package objectworks.modelo;
 import jakarta.persistence.*;
 import java.util.Objects;
 
-@ Entity
+@Entity
 @Table(name="cliente")
 public class Cliente {
 

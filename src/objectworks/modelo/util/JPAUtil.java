@@ -20,18 +20,18 @@ public class JPAUtil {
         try (InputStream in = new FileInputStream("db.properties")){
             props.load(in);
         }  catch (IOException e) {
-            System.err.println("No se ha encontrado el archivo DB.properties");
+            System.err.println("No se ha encontrado el archivo db.properties");
         }
 
         // 2. Meter las propiedades en un Map para Hibernate
         Map<String,String> map = new HashMap<>();
-        map.put("jakarta.persitence.jdbc.dreiver", "com.mysql.cj.jdbc.Driver");
-        map.put("jakarta.persistence.jdn+bc.url", props.getProperty("db.url", "jdbc:mysql://localhost:3306/objectworks?serverTimezone=Europe/Madrid"));
+        map.put("jakarta.persistence.jdbc.driver", "com.mysql.cj.jdbc.Driver");
+        map.put("jakarta.persistence.jdbc.url", props.getProperty("db.url", "jdbc:mysql://localhost:3306/objectworks?serverTimezone=Europe/Madrid"));
         map.put("jakarta.persistence.jdbc.user", props.getProperty("db.usuario", "root"));
         map.put("jakarta.persistence.jdbc.password", props.getProperty("db.password", ""));
 
         //3. Creamos el EntityManagerFactory para pasarle las propiedades
-        emf = Persistence.createEntityManagerFactory("objectworks", map);
+        emf = Persistence.createEntityManagerFactory("objectworksPU", map);
     }
 
     public static EntityManager getEntityManager() {
