@@ -1,5 +1,6 @@
 package objectworks.controlador;
 
+import jakarta.persistence.*;
 import objectworks.modelo.Cliente;
 import objectworks.modelo.Lista;
 import objectworks.modelo.Validador;
@@ -8,10 +9,7 @@ import objectworks.modelo.exceptions.ClienteDuplicadoException;
 import objectworks.modelo.exceptions.ClienteNoEncontradoException;
 import objectworks.modelo.exceptions.DatoInvalidoException;
 import objectworks.modelo.util.JPAUtil;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
-import jakarta.persistence.TypedQuery;
+
 import java.util.List;
 
 /**
@@ -50,7 +48,12 @@ public class ClienteController {
     }
 
     public String verCliente(String dni) throws ClienteNoEncontradoException {
-        return obtenerPorDni(dni).toString();
+        EntityManager em = JPAUtil.getEntityManager();
+        try {
+            return obtenerPorDni(em, dni).toString();
+        } finally {
+            em.close();
+        }
     }
 
     public void anadirCliente(String dni, String nombre, String apellidos, String email, String telefono)
@@ -61,10 +64,7 @@ public class ClienteController {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            TypedQuery<Cliente> query = em.createQuery("SELECT c FROM Cliente c WHERE c.dni = :dni", Cliente.class);
-            query.setParameter("dni", dniNormalizado);
-
-            if (!query.getResultList().isEmpty()) {
+            if (buscarPorDni(em, dniNormalizado) != null) {
                 throw new ClienteDuplicadoException("Ya existe un cliente con ese dni");
             }
 
@@ -86,14 +86,16 @@ public class ClienteController {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            Cliente cliente = obtenerPorDni(dni);
+            Cliente cliente = obtenerPorDni(em, dni);
             Validador.validarDatosCliente(cliente.getDni(), nombre, apellidos, email, telefono);
+
+            //Con una entidad gestionada no hace falta merge:
+            //JPA detecta los cambios de los setters y hace el UPDATE en el commit
+            tx.begin();
             cliente.setNombre(nombre.trim());
             cliente.setApellidos(apellidos.trim());
             cliente.setEmail(email.trim());
             cliente.setTelefono(limpiar(telefono));
-            tx.begin();
-            em.merge(cliente);
             tx.commit();
         } catch (ClienteNoEncontradoException | DatoInvalidoException e) {
             if (tx.isActive()) tx.rollback();
@@ -107,7 +109,7 @@ public class ClienteController {
         EntityManager em = JPAUtil.getEntityManager();
         EntityTransaction tx = em.getTransaction();
         try {
-            Cliente cliente = obtenerPorDni(dni);
+            Cliente cliente = obtenerPorDni(em, dni);
 
             //Como Reserva todavía no es una entidad JPA (parte 4) se hace la consulta con SQL nativo
             Number numReservas = (Number) em.createNativeQuery("SELECT COUNT(*) FROM reserva WHERE id_cliente = ?1").setParameter(1, cliente.getId()).getSingleResult();
@@ -118,7 +120,7 @@ public class ClienteController {
             }
 
             tx.begin();
-            em.remove(em.contains(cliente) ? cliente : em.merge(cliente));
+            em.remove(cliente);
             tx.commit();
         } catch (ClienteNoEncontradoException e) {
             if (tx.isActive()) tx.rollback();
@@ -131,18 +133,17 @@ public class ClienteController {
 
     // ===================== AUXILIARES =====================
 
-    private Cliente obtenerPorDni(String dni) throws ClienteNoEncontradoException {
-        EntityManager em = JPAUtil.getEntityManager();
-        try {
-            TypedQuery<Cliente> query = em.createQuery("SELECT c FROM Cliente c WHERE c.dni = :dni", Cliente.class);
-            query.setParameter("dni", normalizarDni(dni));
-            if (query.getResultList().isEmpty()) {
-                throw new ClienteNoEncontradoException("No existe un cliente con ese dni");
-            }
-            return query.getSingleResult();
-        } finally {
-            em.close();
+    private Cliente buscarPorDni(EntityManager em, String dni) {
+        List<Cliente> resultado = em.createQuery("SELECT c FROM Cliente c WHERE c.dni = :dni", Cliente.class).setParameter("dni", normalizarDni(dni)).getResultList();
+        return resultado.isEmpty() ? null : resultado.get(0);
+    }
+
+    private Cliente obtenerPorDni(EntityManager em, String dni) throws ClienteNoEncontradoException {
+        Cliente cliente = buscarPorDni(em, dni);
+        if (cliente == null) {
+            throw new ClienteNoEncontradoException("No existe el cliente con ese dni");
         }
+        return cliente;
     }
 
     private Lista<String> aTexto(List<Cliente> lista) {
