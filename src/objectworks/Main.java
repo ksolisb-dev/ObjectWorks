@@ -9,8 +9,6 @@ import objectworks.modelo.dao.DAOFactory;
 import objectworks.modelo.util.JPAUtil;
 import objectworks.vista.VistaPrincipal;
 
-import objectworks.modelo.dao.DAOFactory;
-
 public class Main {
     public static void main(String[] args) {
         //Clientes ya usa JPA

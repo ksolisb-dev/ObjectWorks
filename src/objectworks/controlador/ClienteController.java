@@ -159,6 +159,6 @@ public class ClienteController {
     }
 
     private String limpiar(String texto) {
-        return texto == null ? null : texto.trim();
+        return texto == null || texto.isBlank() ? null : texto.trim();
     }
 }
