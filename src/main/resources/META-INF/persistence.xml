@@ -7,12 +7,16 @@
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
 
         <!-- Entidades mapeadas (cada parte anade aqui las suyas) -->
+        <!-- CLIENTES -->
         <class>objectworks.modelo.Cliente</class>
+        <!-- HOTELES -->
         <class>objectworks.modelo.Hotel</class>
+        <!-- HABITACIONES -->
         <class>objectworks.modelo.Habitacion</class>
         <class>objectworks.modelo.HabitacionEstandar</class>
         <class>objectworks.modelo.HabitacionSuperior</class>
         <class>objectworks.modelo.Suite</class>
+        <!-- RESERVAS -->
 
         <properties>
             <!-- La URL, el usuario y la contrasena los pone JPAUtil leyendo db.properties -->
