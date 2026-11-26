@@ -5,14 +5,25 @@
              version="3.0">
     <persistence-unit name="objectworksPU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
-        <properties>
 
+        <!--
+        Se declara de forma explícita qué entidades forman parte de la unidad de persistencia.
+        Cada miembro debe añadir aqui su parte
+        -->
+        <class>objectworks.modelo.Cliente</class>
+
+        <properties>
+            <!--Driver JDBC de MySQL -->
+            <property name="jakarta.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
             <!--Mostrar el SQL que genera Hibernate en la consola y que resulta útil para realizar depuraciones-->
             <property name="hibernate.show_sql" value="true"/>
             <property name="hibernate.format_sql" value="true"/>
 
-            <!--Configuramos para que Hibernate no borre ni realice modificaciones en la estructura de las tablas sin avisar-->
-            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <!--
+            Las tablas las crea el script sql/objectworks_bd.sql-.
+            "validate": Hibernate solo comprueba al arrancar que entidades coinciden con las tablas y, si no, da un error
+            -->
+            <property name="hibernate.hbm2ddl.auto" value="validate"/>
         </properties>
     </persistence-unit>
 </persistence>

@@ -30,14 +30,9 @@ public class JPAUtil {
 
         // 2. Meter las propiedades en un Map para Hibernate
         Map<String,String> map = new HashMap<>();
-        map.put("jakarta.persistence.jdbc.driver", "com.mysql.cj.jdbc.Driver");
         map.put("jakarta.persistence.jdbc.url", props.getProperty("db.url", "jdbc:mysql://localhost:3306/objectworks?serverTimezone=Europe/Madrid"));
         map.put("jakarta.persistence.jdbc.user", props.getProperty("db.usuario", "root"));
         map.put("jakarta.persistence.jdbc.password", props.getProperty("db.password", ""));
-        map.put("hibernate.show_sql", "true");
-        map.put("hibernate.hbm2ddl.auto", "update");
-        map.put("hibernate.format_sql", "true");
-        map.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
 
         //3. Creamos el EntityManagerFactory para pasarle las propiedades
         try {
