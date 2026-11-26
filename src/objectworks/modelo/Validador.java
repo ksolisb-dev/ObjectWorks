@@ -81,6 +81,26 @@ public class Validador {
         }
     }
 
+    // ===================== HOTELES =====================
+
+    // Comprueba los datos de un hotel antes de guardarlo en la BD.
+    // Los tamanos maximos y las estrellas (1 a 5) coinciden con la tabla hotel.
+    public static void validarDatosHotel(String nombre, String ciudad, String direccion,
+                                         int estrellas, String telefono) throws DatoInvalidoException {
+        if (estaVacio(nombre) || estaVacio(ciudad) || estaVacio(direccion)) {
+            throw new DatoInvalidoException("Nombre, ciudad y direccion son obligatorios");
+        }
+        if (estrellas < 1 || estrellas > 5) {
+            throw new DatoInvalidoException("Las estrellas deben estar entre 1 y 5");
+        }
+        validarLongitud(nombre, 100, "nombre");
+        validarLongitud(ciudad, 60, "ciudad");
+        validarLongitud(direccion, 150, "direccion");
+        if (!estaVacio(telefono)) {
+            validarLongitud(telefono, 15, "telefono");
+        }
+    }
+
     private static void validarLongitud(String valor, int maximo, String campo) throws DatoInvalidoException {
         if (valor.trim().length() > maximo) {
             throw new DatoInvalidoException("El campo '" + campo + "' no puede superar " + maximo + " caracteres");

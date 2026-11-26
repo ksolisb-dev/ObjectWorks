@@ -1,5 +1,6 @@
 package objectworks.modelo.dao.mysql;
 
+import objectworks.modelo.Habitacion;
 import objectworks.modelo.Hotel;
 import objectworks.modelo.Lista;
 import objectworks.modelo.dao.HotelDAO;
@@ -137,6 +138,18 @@ public class MySQLHotelDAO implements HotelDAO {
         } catch (SQLException e) {
             throw new DAOException("Error al buscar el hotel por ciudad", e);
         }
+    }
+
+    @Override
+    public Hotel buscarConHabitaciones(Integer id) throws DAOException {
+        Hotel hotel = buscarPorId(id);
+        if (hotel != null) {
+            Lista<Habitacion> habitaciones = new MySQLHabitacionDAO().buscarPorHotel(id);
+            for (Habitacion h : habitaciones.getArrayList()) {
+                hotel.agregarHabitacion(h);
+            }
+        }
+        return hotel;
     }
 
     //-- FUNCIONES AUXILIARES

@@ -35,6 +35,13 @@
             <artifactId>jakarta.persistence-api</artifactId>
             <version>3.1.0</version>
         </dependency>
+
+        <!--JUnit 5 para los tests (estan en src/objectworks/modelo/tests) -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.14.0</version>
+        </dependency>
     </dependencies>
 
     <build>

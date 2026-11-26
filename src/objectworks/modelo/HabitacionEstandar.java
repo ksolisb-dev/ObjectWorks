@@ -1,20 +1,22 @@
 package objectworks.modelo;
 
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 import objectworks.modelo.enums.CategoriaHabitacion;
 
+@Entity
+@DiscriminatorValue("ESTANDAR")
 public class HabitacionEstandar extends Habitacion {
 
-    private double precioBaseNoche;
+    // Usa el atributo precioBaseNoche heredado de Habitacion (columna precio_base_noche)
+
+    // Constructor vacio que necesita JPA
+    protected HabitacionEstandar() {
+    }
 
     public HabitacionEstandar(int id, String numero, String planta,
                               int capacidad, double precioBaseNoche) {
         super(id, numero, planta, capacidad);
-        this.precioBaseNoche = precioBaseNoche;
-    }
-
-    //Getters y setters
-
-    public void setPrecioBaseNoche(double precioBaseNoche) {
         this.precioBaseNoche = precioBaseNoche;
     }
 
@@ -28,10 +30,6 @@ public class HabitacionEstandar extends Habitacion {
     @Override
     public double calcularPrecioNoche() {
         return precioBaseNoche * 1;
-    }
-
-    public double getPrecioBaseNoche() {
-        return precioBaseNoche;
     }
 
     @Override
