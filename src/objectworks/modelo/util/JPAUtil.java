@@ -12,9 +12,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class JPAUtil {
-    private static final EntityManagerFactory emf;
+    private static EntityManagerFactory emf;
 
-    static {
+    public static boolean inicializar() {
+
+        if(emf != null && !emf.isOpen()) {
+            return true;
+        }
+
         // 1. Cargar el archivo db.properties
         Properties props = new Properties();
         try (InputStream in = new FileInputStream("db.properties")){
@@ -29,16 +34,33 @@ public class JPAUtil {
         map.put("jakarta.persistence.jdbc.url", props.getProperty("db.url", "jdbc:mysql://localhost:3306/objectworks?serverTimezone=Europe/Madrid"));
         map.put("jakarta.persistence.jdbc.user", props.getProperty("db.usuario", "root"));
         map.put("jakarta.persistence.jdbc.password", props.getProperty("db.password", ""));
+        map.put("hibernate.show_sql", "true");
+        map.put("hibernate.hbm2ddl.auto", "update");
+        map.put("hibernate.format_sql", "true");
+        map.put("hibernate.dialect", "org.hibernate.dialect.MySQLDialect");
 
         //3. Creamos el EntityManagerFactory para pasarle las propiedades
-        emf = Persistence.createEntityManagerFactory("objectworksPU", map);
+        try {
+            emf = Persistence.createEntityManagerFactory("objectworksPU", map);
+            return true;
+        } catch (RuntimeException e) {
+            System.err.println("Error al iniciar JPA: " + e.getMessage());
+            emf = null;
+            return false;
+        }
     }
 
     public static EntityManager getEntityManager() {
+        if (emf == null || !emf.isOpen()) {
+            throw new IllegalStateException("No se puede establecer la conexion");
+        }
         return emf.createEntityManager();
     }
 
     public static void close() {
-        emf.close();
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
+        emf = null;
     }
 }

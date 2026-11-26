@@ -25,7 +25,7 @@ public class ClienteController {
     public Lista<String> listarClientes() {
         EntityManager em = JPAUtil.getEntityManager();
         try {
-            TypedQuery<Cliente> query = em.createNamedQuery("SELECT c FROM Cliente c ORDER BY c.apellidos", Cliente.class);
+            TypedQuery<Cliente> query = em.createQuery("SELECT c FROM Cliente c ORDER BY c.apellidos", Cliente.class);
             return aTexto(query.getResultList());
         } finally {
             em.close();
@@ -75,6 +75,7 @@ public class ClienteController {
             tx.commit();
         } catch (ClienteDuplicadoException e) {
             if (tx.isActive()) tx.rollback();
+            throw e;
         } finally {
             em.close();
         }
@@ -96,6 +97,7 @@ public class ClienteController {
             tx.commit();
         } catch (ClienteNoEncontradoException | DatoInvalidoException e) {
             if (tx.isActive()) tx.rollback();
+            throw e;
         }  finally {
             em.close();
         }
@@ -106,6 +108,15 @@ public class ClienteController {
         EntityTransaction tx = em.getTransaction();
         try {
             Cliente cliente = obtenerPorDni(dni);
+
+            //Como Reserva todavía no es una entidad JPA (parte 4) se hace la consulta con SQL nativo
+            Number numReservas = (Number) em.createNativeQuery("SELECT COUNT(*) FROM reserva WHERE id_cliente = ?1").setParameter(1, cliente.getId()).getSingleResult();
+
+            //La FK no deja borrar un cliente con reservas: se comprueba antes para dar un mensaje claro
+            if (numReservas.longValue() > 0) {
+                throw new ClienteConReservasException("No se puede eliminar al cliente " + cliente.getDni() + " porque tiene reservas");
+            }
+
             tx.begin();
             em.remove(em.contains(cliente) ? cliente : em.merge(cliente));
             tx.commit();

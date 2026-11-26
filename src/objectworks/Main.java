@@ -5,6 +5,7 @@ import objectworks.controlador.ConsultasController;
 import objectworks.controlador.ReservaController;
 import objectworks.controlador.HabitacionController;
 import objectworks.controlador.HotelController;
+import objectworks.modelo.util.JPAUtil;
 import objectworks.vista.VistaPrincipal;
 
 public class Main {
@@ -17,6 +18,18 @@ public class Main {
 //        ConsultasController consultasController = new ConsultasController(factory);
 
         VistaPrincipal vista = new VistaPrincipal(clienteController, null, null, null, null);
-        vista.inicio();
+
+        //Se comprueba la conexión al arrancar, antes de mostrar el menú
+        if (!JPAUtil.inicializar()) {
+            vista.mostrarErrorConexion();
+            return;
+        }
+
+        try {
+            vista.inicio();
+        } finally {
+            //Se cierra Hibernate y su pool de conexiones al salir
+            JPAUtil.close();
+        }
     }
 }
