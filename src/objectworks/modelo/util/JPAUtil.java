@@ -16,7 +16,7 @@ public class JPAUtil {
 
     public static boolean inicializar() {
 
-        if(emf != null && !emf.isOpen()) {
+        if(emf != null && emf.isOpen()) {
             return true;
         }
 
