@@ -28,7 +28,12 @@ public class Main {
             factory.cerrar();
             return;
         }
-        vista.inicio();
-        factory.cerrar();
+
+        try {
+            vista.inicio();
+        } finally {
+            //Cierra la EntityManagerFactory aunque el programa termine por un error inesperado.
+            factory.cerrar();
+        }
     }
 }

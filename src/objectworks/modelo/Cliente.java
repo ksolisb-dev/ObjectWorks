@@ -3,7 +3,7 @@ package objectworks.modelo;
 import jakarta.persistence.*;
 import java.util.Objects;
 
-@ Entity
+@Entity
 @Table(name="cliente")
 public class Cliente {
 
@@ -12,18 +12,19 @@ public class Cliente {
     @Column(name="id_cliente")
     private int id;
 
-    @Column(unique=true, nullable=false)
+    @Column(name = "dni", length = 9, unique=true, nullable=false)
     private String dni;
 
-    @Column(nullable=false)
+    @Column(name = "nombre", length = 50, nullable=false)
     private String nombre;
 
-    @Column(nullable=false)
+    @Column(name = "apellidos", length = 100, nullable=false)
     private String apellidos;
 
-    @Column(nullable=false)
+    @Column( name = "email", length = 100, nullable=false)
     private String email;
 
+    @Column(name = "telefono", length = 15)
     private String telefono;
 
     // Constructor vacío
