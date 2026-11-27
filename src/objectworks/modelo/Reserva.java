@@ -6,18 +6,60 @@ import java.time.LocalDate;
 
 import java.time.temporal.ChronoUnit;
 
+import jakarta.persistence.*;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Table(name = "reserva") // Correspondencia con la tabla reserva
 public class Reserva {
+
+    // Generamos el id mediante un AUTO_INCREMENT
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_reserva")
     private int id;
+
+    @Column(name = "fecha_entrada",  nullable = false)
     private LocalDate fechaEntrada;
+
+    @Column(name = "fecha_salida",  nullable = false)
     private LocalDate fechaSalida;
+
+    @Column(name = "num_personas",  nullable = false)
     private int numPersonas;
-    private double importe;
+
+    @Column(name = "importe",  nullable = false, precision = 10, scale = 2)
+    private BigDecimal importe = new BigDecimal("0.00");
+
+    @Column(name = "fecha_creacion", nullable = false)
     private LocalDate fechaCreacion;
 
+    // Guardamos las 3 opciones del enum como strings (CONFIRMADA, CANCELADA, FINALIZADA)
+    @Enumerated(EnumType.STRING)
+    @Column(name = "estado", nullable = false)
     private EstadoReserva estado;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) // Respetamos las relaciones entre tablas con el ManyToOne
+    @JoinColumn(name = "id_hotel", nullable = false) // JoinColumn nos indica que contiene una FK
     private Hotel hotel;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false) // Respetamos las relaciones entre tablas con el ManyToOne
+    @JoinColumn(name = "id_cliente",  nullable = false) // JoinColumn nos indica que contiene una FK
     private Cliente cliente;
-    private Lista<Habitacion> habitaciones = new Lista<>();
+
+    // Gestionamos la asociación mediante la tabla intermedia de reserva_habitacion
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "reserva_habitacion",
+            joinColumns = @JoinColumn(name = "id_reserva"),
+            inverseJoinColumns = @JoinColumn(name = "id_habitacion")
+    )
+    private List<Habitacion> habitaciones = new ArrayList<>();
+
 
     public Reserva(int id, LocalDate fechaEntrada,
                    LocalDate fechaSalida, int numPersonas,
@@ -34,11 +76,7 @@ public class Reserva {
         this.hotel = hotel;
         this.cliente = cliente;
 
-        if (habitaciones != null) {
-            this.habitaciones.addAll(habitaciones);
-        }
-
-        this.importe = calcularImporte(); // Calculamos ahora el importe inicial de la reserva basado en las habitaciones y las fechas.
+        setHabitaciones(habitaciones); // nuevo Metod0 añadido que copia las habitaciones y calcula el importe inicial
     }
 
     //Getters y setters
@@ -75,13 +113,35 @@ public class Reserva {
         this.numPersonas = numPersonas;
     }
 
+    // Actualizado para JPA y Hibernate
     public double getImporte() {
-        this.importe = calcularImporte();
-        return this.importe;
+        return importe.doubleValue();
     }
 
+    // Ahora se calcula con ImporteDecimal
     public void recalcularImporte() {
-        this.importe = calcularImporte();
+        this.importe = calcularImporteDecimal();
+    }
+
+    public double calcularImporte() {
+        return calcularImporteDecimal().doubleValue();
+    }
+
+    // Calcula el importe decimal utilizando BigDecimal, así podemos mantener la estructura de devolver un double
+    // Calcula el precio total de una reserva con n_noches * precio_por_noche de cada habitación
+    private BigDecimal calcularImporteDecimal() {
+        int noches = calcularNoches();
+
+        BigDecimal totalPorNoche = BigDecimal.ZERO;
+
+        for (Habitacion habitacion : habitaciones) {
+            BigDecimal precioNoche = BigDecimal.valueOf(habitacion.calcularPrecioNoche());
+
+            totalPorNoche = totalPorNoche.add(precioNoche);
+        }
+
+        // retornamos el importe total redondeado a 2 decimales con HALF_UP
+        return totalPorNoche.multiply(BigDecimal.valueOf(noches).setScale(2, RoundingMode.HALF_UP));
     }
 
     public LocalDate getFechaCreacion() {
@@ -116,14 +176,31 @@ public class Reserva {
         this.cliente = cliente;
     }
 
+    // Adaptado para JPA y Hibernate
     public Lista<Habitacion> getHabitaciones() {
-        return this.habitaciones;
+        return new Lista<>(habitaciones);
     }
 
+    // Actualiza la lista de habitaciones rellenandola y calculando los importes de nuevo
+    public void setHabitaciones(Lista<Habitacion> nuevasHabitaciones) {
+        habitaciones.clear();
+
+        if (nuevasHabitaciones != null) {
+            for (Habitacion habitacion : nuevasHabitaciones.getArrayList()) {
+                if (habitacion != null && !contieneHabitacion(habitacion)){
+                    habitaciones.add(habitacion);
+                }
+            }
+        }
+
+        recalcularImporte();
+    }
+
+    // Adaptado para JPA y Hibernate
     public void agregarHabitacion(Habitacion habitacion) {
-        if (habitacion != null && !habitaciones.contains(habitacion)) {
+        if (habitacion != null && !contieneHabitacion(habitacion)) {
             habitaciones.add(habitacion);
-            this.importe = calcularImporte();
+            recalcularImporte();
         }
     }
 
@@ -141,19 +218,6 @@ public class Reserva {
         }
 
         return Math.toIntExact(ChronoUnit.DAYS.between(fechaEntrada, fechaSalida));
-    }
-
-    // Calcula el precio total de una reserva con n_noches * precio_por_noche de cada habitación.
-    public double calcularImporte() {
-        int noches = calcularNoches();
-        double precioTotalPorNoche = 0.0;
-
-        for (int i = 0; i < habitaciones.size(); i++) {
-            Habitacion habitacion = habitaciones.getAt(i);
-            precioTotalPorNoche += habitacion.calcularPrecioNoche();
-        }
-
-        return precioTotalPorNoche * noches;
     }
 
     // Cambia el estado de la reserva a CANCELADA, de momento tiene sentido.
@@ -178,13 +242,21 @@ public class Reserva {
         return entrada.isBefore(fechaSalida) && salida.isAfter(fechaEntrada);
     }
 
-    // Se compara por id porque los objetos que vienen de la BD son instancias distintas
+    /**
+     * Se compara por id porque los objetos que vienen de la BD son instancias distintas
+     * Actualizado para JPA y Hibernate
+     */
     private boolean contieneHabitacion(Habitacion habitacion) {
-        for (int i = 0; i < habitaciones.size(); i++) {
-            if (habitaciones.getAt(i).getId() == habitacion.getId()) {
+        if (habitacion == null) {
+            return false;
+        }
+
+        for (Habitacion actual : habitaciones){
+            if (actual == habitacion || (habitacion.getId() > 0 && actual.getId() == habitacion.getId())){
                 return true;
             }
         }
+
         return false;
     }
 
