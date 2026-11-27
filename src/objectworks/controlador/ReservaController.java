@@ -101,11 +101,7 @@ public class ReservaController {
         reserva.setFechaEntrada(entrada);
         reserva.setFechaSalida(salida);
         reserva.setNumPersonas(numPersonas);
-        reserva.getHabitaciones().clear();
-        for (int i = 0; i < habitaciones.size(); i++) {
-            reserva.agregarHabitacion(habitaciones.getAt(i));
-        }
-        reserva.recalcularImporte();
+        reserva.setHabitaciones(habitaciones); // Implementado para ORM
 
         reservaDAO.actualizar(reserva);
         return reserva;
