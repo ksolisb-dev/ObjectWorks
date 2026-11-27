@@ -17,6 +17,7 @@
         <class>objectworks.modelo.HabitacionSuperior</class>
         <class>objectworks.modelo.Suite</class>
         <!-- RESERVAS -->
+        <class>objectworks.modelo.Reserva</class>
 
         <properties>
             <!-- La URL, el usuario y la contrasena los pone JPAUtil leyendo db.properties -->
