@@ -1,73 +1,72 @@
 package objectworks.modelo;
 
 import objectworks.modelo.enums.CategoriaHabitacion;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "habitacion")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "categoria", discriminatorType = DiscriminatorType.STRING)
 public abstract class Habitacion {
-    private int id_hotel;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_habitacion")
     private int id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_hotel", nullable = false)
+    private Hotel hotel;
+
+    @Column(nullable = false, length = 10)
     private String numero;
+
+    @Column(nullable = false, length = 10)
     private String planta;
+
+    @Column(nullable = false)
     private int capacidad;
-    protected double precioBaseNoche; // Si no le pongo protected no me lo deja usar
-    // Como es un cambio de ultima hora no estoy muy seguro si esto iba aquí, pero juraría que si
 
-    public Habitacion(int id, String numero, String planta,
-                      int capacidad) {
-        this.id = id;
+    @Column(name = "precio_base_noche", nullable = false)
+    protected double precioBaseNoche;
+
+    public Habitacion() {}
+
+    public Habitacion(String numero, String planta, int capacidad, double precioBaseNoche, Hotel hotel) {
         this.numero = numero;
         this.planta = planta;
         this.capacidad = capacidad;
+        this.precioBaseNoche = precioBaseNoche;
+        this.hotel = hotel;
     }
 
-    //Getters y setters
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
-    public int getId() {
-        return id;
+    public Hotel getHotel() { return hotel; }
+    public void setHotel(Hotel hotel) { this.hotel = hotel; }
+
+    public String getNumero() { return numero; }
+    public void setNumero(String numero) { this.numero = numero; }
+
+    public String getPlanta() { return planta; }
+    public void setPlanta(String planta) { this.planta = planta; }
+
+    public int getCapacidad() { return capacidad; }
+    public void setCapacidad(int capacidad) { this.capacidad = capacidad; }
+
+    public int getIdHotel() {
+        return hotel != null ? hotel.getId() : 0;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdHotel(int idHotel) {
+        hotel.setId(idHotel);
     }
 
-    public String getNumero() {
-        return numero;
-    }
-
-    public void setNumero(String numero) {
-        this.numero = numero;
-    }
-
-    public String getPlanta() {
-        return planta;
-    }
-
-    public void setPlanta(String planta) {
-        this.planta = planta;
-    }
-
-    public int getCapacidad() {
-        return capacidad;
-    }
-
-    public void setCapacidad(int capacidad) {
-        this.capacidad = capacidad;
-    }
-
-    public int getIdHotel() { return id_hotel; }
-
-    public void setIdHotel(int id_hotel) { this.id_hotel = id_hotel; }
-
-    //Funciones
+    public double getPrecioBaseNoche() { return precioBaseNoche; }
+    public void setPrecioBaseNoche(double precioBaseNoche) { this.precioBaseNoche = precioBaseNoche; }
 
     public abstract CategoriaHabitacion getCategoria();
-
-    public double getPrecioBaseNoche() {
-        return precioBaseNoche;
-    }
-
-    public void setPrecioBaseNoche(double precioBaseNoche) {
-        this.precioBaseNoche = precioBaseNoche;
-    }
 
     public double calcularPrecioNoche() {
         return precioBaseNoche;
@@ -75,13 +74,8 @@ public abstract class Habitacion {
 
     @Override
     public String toString() {
-        return "Habitacion{" +
-                "id=" + id +
-                ", numero='" + numero + '\'' +
-                ", planta='" + planta + '\'' +
-                ", capacidad=" + capacidad +
-                ", categoria=" + getCategoria() +
-                ", precioBaseNoche=" + getPrecioBaseNoche() +
-                '}';
+        return "Habitacion{id=" + id + ", numero='" + numero + "', planta='" + planta +
+                "', capacidad=" + capacidad + ", categoria=" + getCategoria() +
+                ", precioBaseNoche=" + precioBaseNoche + "}";
     }
 }

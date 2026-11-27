@@ -2,16 +2,27 @@ package objectworks.modelo;
 
 import java.util.ArrayList;
 import java.util.List;
+import jakarta.persistence.*;
 
+@Entity
+@Table(name = "hotel")
 public class Hotel {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id_hotel")
     private int id;
+
     private String nombre;
     private String ciudad;
     private String direccion;
     private int estrellas;
     private String telefono;
 
-    private Lista<Habitacion> habitaciones = new Lista<>();
+    @OneToMany(mappedBy = "hotel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Habitacion> habitaciones = new ArrayList<>();
+
+    public Hotel() {}
 
     public Hotel(int id, String nombre, String ciudad,
                  String direccion, int estrellas, String telefono) {
@@ -22,8 +33,6 @@ public class Hotel {
         this.estrellas = estrellas;
         this.telefono = telefono;
     }
-
-    //Getters y setters
 
     public int getId() {
         return id;
@@ -73,14 +82,19 @@ public class Hotel {
         this.telefono = telefono;
     }
 
-    public void agregarHabitacion(Habitacion habitacion) {
-        if (habitacion != null && !habitaciones.lista.contains(habitacion)) {
-            habitaciones.add(habitacion);
-        }
+    public List<Habitacion> getHabitaciones() {
+        return habitaciones;
     }
 
-    public Lista<Habitacion> getHabitaciones() {
-        return habitaciones;
+    public void setHabitaciones(List<Habitacion> habitaciones) {
+        this.habitaciones = habitaciones;
+    }
+
+    public void agregarHabitacion(Habitacion habitacion) {
+        if (habitacion != null && !habitaciones.contains(habitacion)) {
+            habitaciones.add(habitacion);
+            habitacion.setHotel(this);
+        }
     }
 
     @Override

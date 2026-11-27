@@ -1,24 +1,23 @@
 package objectworks.modelo;
 
 import objectworks.modelo.enums.CategoriaHabitacion;
+import jakarta.persistence.DiscriminatorValue;
+import jakarta.persistence.Entity;
 
+@Entity
+@DiscriminatorValue("SUPERIOR")
 public class HabitacionSuperior extends Habitacion {
 
-    private double precioBaseNoche;
+    public HabitacionSuperior() {}
 
-    public HabitacionSuperior(int id, String numero, String planta,
-                              int capacidad, double precioBaseNoche) {
-        super(id, numero, planta, capacidad);
-        this.precioBaseNoche = precioBaseNoche;
+    public HabitacionSuperior(String numero, String planta, int capacidad, double precioBaseNoche, Hotel hotel) {
+        super(numero, planta, capacidad, precioBaseNoche, hotel);
     }
 
-    //Getters y setters
-
-    public void setPrecioBaseNoche(double precioBaseNoche) {
-        this.precioBaseNoche = precioBaseNoche;
+    public HabitacionSuperior(int id, String numero, String planta, int capacidad, double precioBaseNoche) {
+        super(numero, planta, capacidad, precioBaseNoche, null);
+        setId(id);
     }
-
-    //Funciones
 
     @Override
     public CategoriaHabitacion getCategoria() {
@@ -27,18 +26,6 @@ public class HabitacionSuperior extends Habitacion {
 
     @Override
     public double calcularPrecioNoche() {
-        return precioBaseNoche * 1.5;
+        return getPrecioBaseNoche() * 1.5;
     }
-
-    public double getPrecioBaseNoche() {
-        return precioBaseNoche;
-    }
-
-    @Override
-    public String toString() {
-        return getCategoria() + "{" +
-                super.toString() +
-                '}';
-    }
-
 }

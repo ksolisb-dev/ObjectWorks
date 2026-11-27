@@ -17,7 +17,7 @@ public class Main {
         ClienteController clienteController = new ClienteController(factory);
         ReservaController reservaController = new ReservaController(factory);
         HotelController hotelController = new HotelController(factory);
-        HabitacionController habitacionController = new HabitacionController(factory);
+        HabitacionController habitacionController = new HabitacionController();
         ConsultasController consultasController = new ConsultasController(factory);
 
         VistaPrincipal vista = new VistaPrincipal(clienteController, reservaController, hotelController,
