@@ -47,7 +47,7 @@ public class ClienteController {
         String dniNormalizado = normalizarDni(dni);
 
         if(clienteDAO.buscarPorDni(dniNormalizado) != null) {
-            throw new ClienteDuplicadoException("Ya existente un cliente con ese DNI");
+            throw new ClienteDuplicadoException("Ya existe un cliente con ese DNI");
         }
 
         Cliente nuevo = new Cliente(dniNormalizado, nombre.trim(), apellidos.trim(), email.trim(), limpiar(telefono));
