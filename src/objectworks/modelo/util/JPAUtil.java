@@ -31,10 +31,14 @@ public class JPAUtil {
         if (emf == null) {
             // 1. Cargar el archivo db.properties
             Properties props = new Properties();
+            System.out.println(
+                    "Buscando configuración en: "
+                            + new java.io.File("db.properties").getAbsolutePath()
+            );
             try (InputStream in = new FileInputStream("db.properties")) {
                 props.load(in);
             } catch (IOException e) {
-                System.err.println("No se ha encontrado db.properties, se usan los valores por defecto");
+                System.err.println("No se ha podido leer db.properties " + e.getMessage());
             }
 
             // 2. Pasar las propiedades a JPA (nombres estandar jakarta.persistence.jdbc.*)

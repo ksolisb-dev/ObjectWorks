@@ -79,6 +79,10 @@ public class Reserva {
         setHabitaciones(habitaciones); // nuevo Metod0 añadido que copia las habitaciones y calcula el importe inicial
     }
 
+    protected Reserva() {
+        // Lo utiliza JPA al recuperar reservas de la bbdd
+    }
+
     //Getters y setters
 
     public int getId() {
