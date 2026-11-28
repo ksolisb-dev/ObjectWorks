@@ -10,8 +10,9 @@ import objectworks.vista.VistaPrincipal;
 
 public class Main {
     public static void main(String[] args) {
-        // Patron Factory: el unico sitio donde se elige el motor de base de datos
-        DAOFactory factory = DAOFactory.getDAOFactory(DAOFactory.MYSQL);
+        // Patron Factory: el unico sitio donde se elige como se guardan los datos
+        // Producto 4: JPA (antes DAOFactory.MYSQL con JDBC)
+        DAOFactory factory = DAOFactory.getDAOFactory(DAOFactory.JPA);
 
         // Un controlador por cada gestion (los demas se anaden en sus partes)
         ClienteController clienteController = new ClienteController(factory);
@@ -24,8 +25,15 @@ public class Main {
                 habitacionController, consultasController);
         if (!factory.probarConexion()) {
             vista.mostrarErrorConexion();
+            factory.cerrar();
             return;
         }
-        vista.inicio();
+
+        try {
+            vista.inicio();
+        } finally {
+            //Cierra la EntityManagerFactory aunque el programa termine por un error inesperado.
+            factory.cerrar();
+        }
     }
 }

@@ -1,13 +1,30 @@
 package objectworks.modelo;
 
+import jakarta.persistence.*;
 import java.util.Objects;
 
+@Entity
+@Table(name="cliente")
 public class Cliente {
-    private int id;          // Clave primaria autonumerica en la BD (0 = todavia no guardado)
+
+    @Id
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
+    @Column(name="id_cliente")
+    private int id;
+
+    @Column(name = "dni", length = 9, unique=true, nullable=false)
     private String dni;
+
+    @Column(name = "nombre", length = 50, nullable=false)
     private String nombre;
+
+    @Column(name = "apellidos", length = 100, nullable=false)
     private String apellidos;
+
+    @Column( name = "email", length = 100, nullable=false)
     private String email;
+
+    @Column(name = "telefono", length = 15)
     private String telefono;
 
     // Constructor vacío

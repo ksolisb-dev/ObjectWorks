@@ -64,7 +64,7 @@ public class ReservaController {
 
     public Lista<Reserva> buscarReservaPorDni(String dni) throws DAOException, ReservaNoEncontradaException {
         Lista<Reserva> r = reservaDAO.buscarPorDni(dni);
-        if (r == null) {
+        if (r.isEmpty()) {
             throw new ReservaNoEncontradaException("No existe la reserva con dni " + dni);
         }
         return r;
@@ -89,8 +89,7 @@ public class ReservaController {
         );
 
         int id = reservaDAO.insertar(reserva);
-        reserva.setId(id);
-        return reserva;
+        return buscarReservaPorId(id);
     }
 
     public Reserva modificarReserva(int idReserva, LocalDate entrada, LocalDate salida,
@@ -101,13 +100,9 @@ public class ReservaController {
         reserva.setFechaEntrada(entrada);
         reserva.setFechaSalida(salida);
         reserva.setNumPersonas(numPersonas);
-        reserva.getHabitaciones().clear();
-        for (int i = 0; i < habitaciones.size(); i++) {
-            reserva.agregarHabitacion(habitaciones.getAt(i));
-        }
-        reserva.recalcularImporte();
+        reserva.setHabitaciones(habitaciones); // Implementado para ORM
 
         reservaDAO.actualizar(reserva);
-        return reserva;
+        return buscarReservaPorId(idReserva);
     }
 }

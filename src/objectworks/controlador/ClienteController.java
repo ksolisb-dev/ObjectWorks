@@ -8,15 +8,14 @@ import objectworks.modelo.dao.DAOFactory;
 import objectworks.modelo.exceptions.ClienteConReservasException;
 import objectworks.modelo.exceptions.ClienteDuplicadoException;
 import objectworks.modelo.exceptions.ClienteNoEncontradoException;
-import objectworks.modelo.exceptions.DAOException;
 import objectworks.modelo.exceptions.DatoInvalidoException;
+import objectworks.modelo.exceptions.DAOException;
 
 /**
  * Controlador de la gestion de clientes (Parte 1).
  *
  * Hace de puente entre GestionClientesVista y el Modelo:
- * valida los datos con Validador y guarda/lee con el ClienteDAO.
- * No sabe que la base de datos es MySQL: recibe el DAO de la DAOFactory.
+ * Valída los datos con Validador y guarda/lee con el CLienteDAO.
  * Devuelve texto para que la Vista no toque clases del Modelo.
  */
 public class ClienteController {
@@ -47,47 +46,44 @@ public class ClienteController {
         Validador.validarDatosCliente(dni, nombre, apellidos, email, telefono);
         String dniNormalizado = normalizarDni(dni);
 
-        if (clienteDAO.buscarPorDni(dniNormalizado) != null) {
-            throw new ClienteDuplicadoException("Ya existe un cliente con DNI " + dniNormalizado);
+        if(clienteDAO.buscarPorDni(dniNormalizado) != null) {
+            throw new ClienteDuplicadoException("Ya existente un cliente con ese DNI");
         }
 
-        Cliente nuevo = new Cliente(dniNormalizado, nombre.trim(), apellidos.trim(),
-                email.trim(), limpiar(telefono));
+        Cliente nuevo = new Cliente(dniNormalizado, nombre.trim(), apellidos.trim(), email.trim(), limpiar(telefono));
         clienteDAO.insertar(nuevo);
     }
 
+
     public void modificarCliente(String dni, String nombre, String apellidos, String email, String telefono)
-            throws ClienteNoEncontradoException, DatoInvalidoException, DAOException {
+            throws ClienteNoEncontradoException, DatoInvalidoException, DAOException{
         Cliente cliente = obtenerPorDni(dni);
         Validador.validarDatosCliente(cliente.getDni(), nombre, apellidos, email, telefono);
 
-        cliente.setNombre(nombre.trim());
-        cliente.setApellidos(apellidos.trim());
-        cliente.setEmail(email.trim());
-        cliente.setTelefono(limpiar(telefono));
-        clienteDAO.actualizar(cliente);
+            cliente.setNombre(nombre.trim());
+            cliente.setApellidos(apellidos.trim());
+            cliente.setEmail(email.trim());
+            cliente.setTelefono(limpiar(telefono));
+            clienteDAO.actualizar(cliente);
     }
 
-    public void eliminarCliente(String dni)
-            throws ClienteNoEncontradoException, ClienteConReservasException, DAOException {
+    public void eliminarCliente(String dni) throws ClienteNoEncontradoException, ClienteConReservasException, DAOException {
         Cliente cliente = obtenerPorDni(dni);
-
-        // Primera comprobacion aqui; el procedimiento sp_eliminar_cliente y la FK
-        // de la tabla reserva lo vuelven a impedir en la BD
+        //La FK de la tabla reserva no deja borrar un cliente con reservas:
+        //Se comprueba antes de dar un mensaje claro en lugar del error de MySQL
         if (clienteDAO.tieneReservas(cliente.getId())) {
-            throw new ClienteConReservasException(
-                    "No se puede eliminar a " + cliente.getNombre() + " " + cliente.getApellidos()
-                    + " porque tiene reservas registradas");
+            throw new ClienteConReservasException("No se puede eliminar este cliente porque tiene reservas");
         }
         clienteDAO.eliminar(cliente.getId());
     }
+
 
     // ===================== AUXILIARES =====================
 
     private Cliente obtenerPorDni(String dni) throws ClienteNoEncontradoException, DAOException {
         Cliente cliente = clienteDAO.buscarPorDni(normalizarDni(dni));
-        if (cliente == null) {
-            throw new ClienteNoEncontradoException("No existe ningun cliente con DNI " + dni);
+        if(cliente == null) {
+            throw new ClienteNoEncontradoException("No existe un cliente con ese DNI");
         }
         return cliente;
     }
@@ -105,6 +101,6 @@ public class ClienteController {
     }
 
     private String limpiar(String texto) {
-        return texto == null ? null : texto.trim();
+        return texto == null || texto.isBlank() ? null : texto.trim();
     }
 }
