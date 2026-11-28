@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.TreeSet;
 import java.time.LocalDate;
+import java.util.Locale;
 
 public class JPAReservaDAO {
 
@@ -474,6 +475,116 @@ public class JPAReservaDAO {
         cancelar(idReserva);
     }
 
+    // METOD0S LISTAR CON FILTRO
+
+    /**
+     * Lista por DNI
+     * @param dni
+     * @return
+     * @throws DAOException
+     */
+    public Lista<Reserva> buscarPorDni(String dni)
+            throws DAOException {
+
+        if (dni == null || dni.isBlank()) {
+            throw new DAOException(
+                    "El DNI del cliente es obligatorio"
+            );
+        }
+
+        String dniNormalizado =
+                dni.trim().toUpperCase(Locale.ROOT);
+
+        return listarFiltradas(
+                "r.cliente.dni = :valor",
+                dniNormalizado
+        );
+    }
+
+    /**
+     * Lista por Hotel
+     * @param idHotel
+     * @return
+     * @throws DAOException
+     */
+    public Lista<Reserva> listarPorHotel(int idHotel)
+            throws DAOException {
+
+        if (idHotel <= 0) {
+            throw new DAOException(
+                    "El identificador del hotel debe ser positivo"
+            );
+        }
+
+        return listarFiltradas(
+                "r.hotel.id = :valor",
+                idHotel
+        );
+    }
+
+    /**
+     * Lista por estado de reserva
+     * @param estado
+     * @return
+     * @throws DAOException
+     */
+    public Lista<Reserva> listarPorEstado(EstadoReserva estado)
+            throws DAOException {
+
+        if (estado == null) {
+            throw new DAOException(
+                    "El estado de la reserva es obligatorio"
+            );
+        }
+
+        return listarFiltradas(
+                "r.estado = :valor",
+                estado
+        );
+    }
+
+    /**
+     * Lista por fecha de entrada
+     * @param fecha
+     * @return
+     * @throws DAOException
+     */
+    public Lista<Reserva> listarPorFechaEntrada(LocalDate fecha)
+            throws DAOException {
+
+        if (fecha == null) {
+            throw new DAOException(
+                    "La fecha de entrada es obligatoria"
+            );
+        }
+
+        return listarFiltradas(
+                "r.fechaEntrada = :valor",
+                fecha
+        );
+    }
+
+    /**
+     * Lista por fecha de salida
+     * @param fecha
+     * @return
+     * @throws DAOException
+     */
+    public Lista<Reserva> listarPorFechaSalida(LocalDate fecha)
+            throws DAOException {
+
+        if (fecha == null) {
+            throw new DAOException(
+                    "La fecha de salida es obligatoria"
+            );
+        }
+
+        return listarFiltradas(
+                "r.fechaSalida = :valor",
+                fecha
+        );
+    }
+
     // METOD0S AUXILIARES
 
     /**
@@ -556,6 +667,43 @@ public class JPAReservaDAO {
                 tx.rollback();
             } catch (RuntimeException errorRollback) {
                 causa.addSuppressed(errorRollback);
+            }
+        }
+    }
+
+    /**
+     * Metodo auxiliar para filtrar las reservas con filtro.
+     * @param condicion
+     * @param valor asigna los datos introducidos por el usuario
+     * @return Lista de las reservas según la condición indicada
+     * @throws DAOException
+     */
+    private Lista<Reserva> listarFiltradas(String condicion, Object valor) throws DAOException {
+
+        EntityManager em = null;
+
+        try {
+            em = JPAUtil.getEntityManager();
+
+            String jpql = JPQL_BASE
+                    + "WHERE " + condicion
+                    + " ORDER BY r.fechaEntrada DESC, r.id";
+
+            List<Reserva> resultado = em
+                    .createQuery(jpql, Reserva.class)
+                    .setParameter("valor", valor)
+                    .getResultList();
+
+            return new Lista<>(resultado);
+
+        } catch (RuntimeException e) {
+            throw new DAOException(
+                    "Error al consultar las reservas", e
+            );
+
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
             }
         }
     }
