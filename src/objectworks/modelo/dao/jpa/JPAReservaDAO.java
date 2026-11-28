@@ -10,6 +10,7 @@ import objectworks.modelo.Hotel;
 import objectworks.modelo.Habitacion;
 import objectworks.modelo.Reserva;
 import objectworks.modelo.enums.EstadoReserva;
+import objectworks.modelo.dao.ReservaDAO;
 
 import objectworks.modelo.exceptions.DAOException;
 import objectworks.modelo.util.JPAUtil;
@@ -20,7 +21,7 @@ import java.util.TreeSet;
 import java.time.LocalDate;
 import java.util.Locale;
 
-public class JPAReservaDAO {
+public class JPAReservaDAO implements ReservaDAO{
 
     // CONSULTAS SQL
 
@@ -48,6 +49,13 @@ public class JPAReservaDAO {
 
     // METOD0S
 
+    /**
+     * Busca reserva por ID
+     * @param id
+     * @return reserva
+     * @throws DAOException
+     */
+    @Override
     public Reserva buscarPorId(Integer id) throws DAOException {
         if (id == null || id <= 0) {
             throw new DAOException(
@@ -78,6 +86,12 @@ public class JPAReservaDAO {
         }
     }
 
+    /**
+     * Lista todas las reservas
+     * @return reservas
+     * @throws DAOException
+     */
+    @Override
     public Lista<Reserva> listarTodos() throws DAOException {
         EntityManager em = null;
 
@@ -111,6 +125,7 @@ public class JPAReservaDAO {
      * @return reserva insertada o transacción cancelada
      * @throws DAOException
      */
+    @Override
     public Integer insertar(Reserva solicitud) throws DAOException {
         List<Integer> ids = validarDatosReserva(solicitud);
 
@@ -253,6 +268,7 @@ public class JPAReservaDAO {
      *        guardada --> entidad recuperada y gestionada por este EntityManager.
      * @throws DAOException
      */
+    @Override
     public void actualizar(Reserva solicitud) throws DAOException {
         List<Integer> ids = validarDatosReserva(solicitud);
 
@@ -404,6 +420,7 @@ public class JPAReservaDAO {
      * @param idReserva
      * @throws DAOException
      */
+    @Override
     public void cancelar(int idReserva) throws DAOException {
         if (idReserva <= 0) {
             throw new DAOException(
@@ -465,6 +482,7 @@ public class JPAReservaDAO {
      * @param idReserva
      * @throws DAOException
      */
+    @Override
     public void eliminar(Integer idReserva) throws DAOException {
         if (idReserva == null) {
             throw new DAOException(
@@ -483,6 +501,7 @@ public class JPAReservaDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public Lista<Reserva> buscarPorDni(String dni)
             throws DAOException {
 
@@ -507,6 +526,7 @@ public class JPAReservaDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public Lista<Reserva> listarPorHotel(int idHotel)
             throws DAOException {
 
@@ -528,6 +548,7 @@ public class JPAReservaDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public Lista<Reserva> listarPorEstado(EstadoReserva estado)
             throws DAOException {
 
@@ -549,6 +570,7 @@ public class JPAReservaDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public Lista<Reserva> listarPorFechaEntrada(LocalDate fecha)
             throws DAOException {
 
@@ -570,6 +592,7 @@ public class JPAReservaDAO {
      * @return
      * @throws DAOException
      */
+    @Override
     public Lista<Reserva> listarPorFechaSalida(LocalDate fecha)
             throws DAOException {
 

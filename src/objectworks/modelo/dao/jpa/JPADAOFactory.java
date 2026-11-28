@@ -6,7 +6,6 @@ import objectworks.modelo.dao.HabitacionDAO;
 import objectworks.modelo.dao.HotelDAO;
 import objectworks.modelo.dao.ReservaDAO;
 import objectworks.modelo.dao.mysql.MySQLHabitacionDAO;
-import objectworks.modelo.dao.mysql.MySQLReservaDAO;
 import objectworks.modelo.util.JPAUtil;
 
 /**
@@ -36,7 +35,7 @@ public class JPADAOFactory extends DAOFactory {
 
     @Override
     public ReservaDAO getReservaDAO() {
-        return new MySQLReservaDAO();        // Parte 4: cambiar por new JPAReservaDAO()
+        return new JPAReservaDAO();        // Parte 4: Hecha con JPA
     }
 
     @Override
