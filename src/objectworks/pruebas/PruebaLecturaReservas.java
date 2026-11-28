@@ -3,6 +3,7 @@ package objectworks.pruebas;
 import objectworks.modelo.Lista;
 import objectworks.modelo.Reserva;
 import objectworks.modelo.dao.jpa.JPAReservaDAO;
+import objectworks.modelo.exceptions.DAOException;
 import objectworks.modelo.util.JPAUtil;
 
 import java.time.LocalDate;
@@ -100,6 +101,40 @@ public class PruebaLecturaReservas {
                 System.out.println("Reserva modificada: " + modificada);
                 System.out.println("Noches: " + modificada.calcularNoches());
                 System.out.println("Importe: " + modificada.getImporte());
+
+                int totalAntes = dao.listarTodos().size();
+
+                Reserva antes = dao.buscarPorId(id);
+                int habitacionesAntes = antes.getHabitaciones().size();
+
+                dao.cancelar(id);
+
+                Reserva cancelada = dao.buscarPorId(id);
+
+                System.out.println("Estado: " + cancelada.getEstado());
+
+                System.out.println(
+                        "Se conserva la reserva: "
+                                + (dao.listarTodos().size() == totalAntes)
+                );
+
+                System.out.println(
+                        "Se conservan las habitaciones: "
+                                + (cancelada.getHabitaciones().size() == habitacionesAntes)
+                );
+
+                try {
+                    dao.cancelar(id);
+
+                    throw new AssertionError(
+                            "No debería permitir cancelar otra vez la reserva"
+                    );
+
+                } catch (DAOException e) {
+                    System.out.println(
+                            "Segunda cancelación rechazada: " + e.getMessage()
+                    );
+                }
             }
 
 

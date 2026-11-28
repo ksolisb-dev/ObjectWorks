@@ -395,6 +395,85 @@ public class JPAReservaDAO {
         }
     }
 
+
+    /**
+     * Metodo CANCELAR reserva
+     * La cancelación de una reserva cambiará el estado de esta a CANCELADA, conservando la reserva y sus habitaciones asociadas.
+     * De esta forma se puede mantener el historial.
+     * @param idReserva
+     * @throws DAOException
+     */
+    public void cancelar(int idReserva) throws DAOException {
+        if (idReserva <= 0) {
+            throw new DAOException(
+                    "El identificador de reserva debe ser positivo"
+            );
+        }
+
+        EntityManager em = null;
+        EntityTransaction tx = null;
+
+        try {
+            em = JPAUtil.getEntityManager();
+            tx = em.getTransaction();
+            tx.begin();
+
+            Reserva guardada = em.find(
+                    Reserva.class,
+                    idReserva,
+                    LockModeType.PESSIMISTIC_WRITE
+            );
+
+            if (guardada == null) {
+                throw new DAOException(
+                        "No existe la reserva " + idReserva
+                );
+            }
+
+            if (guardada.getEstado() != EstadoReserva.CONFIRMADA) {
+                throw new DAOException(
+                        "Solo se pueden cancelar reservas CONFIRMADA"
+                );
+            }
+
+            guardada.cancelar();
+
+            tx.commit();
+
+        } catch (DAOException | RuntimeException e) {
+            deshacer(tx, e);
+
+            if (e instanceof DAOException daoException) {
+                throw daoException;
+            }
+
+            throw new DAOException(
+                    "No se ha podido cancelar la reserva", e
+            );
+
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
+    /**
+     * Metodo ELIMINAR reserva
+     * Mera formalidad. Lo mismo que el metodo cancelar.
+     * @param idReserva
+     * @throws DAOException
+     */
+    public void eliminar(Integer idReserva) throws DAOException {
+        if (idReserva == null) {
+            throw new DAOException(
+                    "El identificador de reserva es obligatorio"
+            );
+        }
+
+        cancelar(idReserva);
+    }
+
     // METOD0S AUXILIARES
 
     /**
