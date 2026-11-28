@@ -21,6 +21,8 @@ import java.time.LocalDate;
 
 public class JPAReservaDAO {
 
+    // CONSULTAS SQL
+
     // Importante utilizar el FETCH para cerrar el EntityManager antes de volver el resultado de la consulta.
     private static final String JPQL_BASE =
             "SELECT DISTINCT r FROM Reserva r "
@@ -43,7 +45,7 @@ public class JPAReservaDAO {
                     + "AND r.fechaEntrada < :salida "
                     + "AND r.fechaSalida > :entrada";
 
-    // METOD0S JPA IMPLEMENTADO
+    // METOD0S
 
     public Reserva buscarPorId(Integer id) throws DAOException {
         if (id == null || id <= 0) {
@@ -98,8 +100,6 @@ public class JPAReservaDAO {
         }
     }
 
-    // CONSULTAS
-
     /**
      * Metodo INSERTAR una reserva:
      * Entre el begin() y commit() comprobamos las referencias, la capacidad y la disponibilidad.
@@ -111,7 +111,13 @@ public class JPAReservaDAO {
      * @throws DAOException
      */
     public Integer insertar(Reserva solicitud) throws DAOException {
-        List<Integer> ids = validarNuevaReserva(solicitud);
+        List<Integer> ids = validarDatosReserva(solicitud);
+
+        if (solicitud.getId() != 0) {
+            throw new DAOException(
+                    "Para insertar se necesita una reserva nueva, con ID 0"
+            );
+        }
 
         EntityManager em = null;
         EntityTransaction tx = null;
@@ -238,6 +244,157 @@ public class JPAReservaDAO {
         }
     }
 
+    /**
+     * Metodo ACTUALIZAR una reserva
+     * Actualiza una reserva comprobando que todos los datos son los correctos.
+     *
+     * @param solicitud --> contiene los cambios propuestos por el controlador.
+     *        guardada --> entidad recuperada y gestionada por este EntityManager.
+     * @throws DAOException
+     */
+    public void actualizar(Reserva solicitud) throws DAOException {
+        List<Integer> ids = validarDatosReserva(solicitud);
+
+        if (solicitud.getId() <= 0) {
+            throw new DAOException(
+                    "Para modificar se necesita una reserva existente"
+            );
+        }
+
+        EntityManager em = null;
+        EntityTransaction tx = null;
+
+        try {
+            em = JPAUtil.getEntityManager();
+            tx = em.getTransaction();
+            tx.begin();
+
+            // Recuperamos y bloqueamos la reserva que modificaremos.
+            Reserva guardada = em.find(
+                    Reserva.class,
+                    solicitud.getId(),
+                    LockModeType.PESSIMISTIC_WRITE
+            );
+
+            if (guardada == null) {
+                throw new DAOException(
+                        "No existe la reserva " + solicitud.getId()
+                );
+            }
+
+            if (guardada.getEstado() != EstadoReserva.CONFIRMADA) {
+                throw new DAOException(
+                        "Solo se pueden modificar reservas CONFIRMADA"
+                );
+            }
+
+            // Bloqueamos las habitaciones seleccionadas en orden de ID.
+            List<Habitacion> habitaciones = new ArrayList<>();
+
+            for (Integer id : ids) {
+                Habitacion habitacion = em.find(
+                        Habitacion.class,
+                        id,
+                        LockModeType.PESSIMISTIC_WRITE
+                );
+
+                if (habitacion == null) {
+                    throw new DAOException(
+                            "No existe la habitación " + id
+                    );
+                }
+
+                habitaciones.add(habitacion);
+            }
+
+            // La modificación mantiene el cliente y el hotel originales.
+            int idHotel = guardada.getHotel().getId();
+
+            if (solicitud.getHotel().getId() != idHotel
+                    || solicitud.getCliente().getId()
+                    != guardada.getCliente().getId()) {
+                throw new DAOException(
+                        "Esta operación no permite cambiar "
+                                + "el cliente ni el hotel"
+                );
+            }
+
+            long capacidadTotal = 0;
+
+            for (Habitacion habitacion : habitaciones) {
+                if (habitacion.getIdHotel() != idHotel) {
+                    throw new DAOException(
+                            "Todas las habitaciones deben pertenecer "
+                                    + "al hotel de la reserva"
+                    );
+                }
+
+                capacidadTotal += habitacion.getCapacidad();
+            }
+
+            if (solicitud.getNumPersonas() > capacidadTotal) {
+                throw new DAOException(
+                        "Las personas superan la capacidad total "
+                                + "de las habitaciones"
+                );
+            }
+
+            // La propia reserva no debe considerarse un conflicto.
+            Long conflictos = em.createQuery(
+                            JPQL_CONFLICTOS + " AND r.id <> :idIgnorada", // Esto evita que la reserva encuentre sus propias habitaciones ocupadas por ella misma.
+                            Long.class
+                    )
+                    .setParameter("ids", ids)
+                    .setParameter(
+                            "cancelada", EstadoReserva.CANCELADA
+                    )
+                    .setParameter(
+                            "entrada", solicitud.getFechaEntrada()
+                    )
+                    .setParameter(
+                            "salida", solicitud.getFechaSalida()
+                    )
+                    .setParameter(
+                            "idIgnorada", guardada.getId()
+                    )
+                    .getSingleResult();
+
+            if (conflictos > 0) {
+                throw new DAOException(
+                        "Alguna habitación ya está reservada "
+                                + "para las nuevas fechas"
+                );
+            }
+
+            // Aplicamos los cambios sobre la entidad gestionada.
+            guardada.setFechaEntrada(solicitud.getFechaEntrada());
+            guardada.setFechaSalida(solicitud.getFechaSalida());
+            guardada.setNumPersonas(solicitud.getNumPersonas());
+
+            // Sustituye las asociaciones y recalcula el importe
+            // con las habitaciones recuperadas de la BD.
+            guardada.setHabitaciones(new Lista<>(habitaciones));
+
+            tx.commit();
+
+        } catch (DAOException | RuntimeException e) {
+            deshacer(tx, e);
+
+            if (e instanceof DAOException daoException) {
+                throw daoException;
+            }
+
+            throw new DAOException(
+                    "No se ha podido modificar la reserva", e
+            );
+
+        } finally {
+            if (em != null && em.isOpen()) {
+                em.close();
+            }
+        }
+    }
+
     // METOD0S AUXILIARES
 
     /**
@@ -246,12 +403,12 @@ public class JPAReservaDAO {
      * @return Lista de ids
      * @throws DAOException
      */
-    private List<Integer> validarNuevaReserva(Reserva reserva)
+    private List<Integer> validarDatosReserva(Reserva reserva)
             throws DAOException {
 
-        if (reserva == null || reserva.getId() != 0) {
+        if (reserva == null) {
             throw new DAOException(
-                    "Para insertar se necesita una reserva nueva, con ID 0"
+                    "La reserva es obligatoria"
             );
         }
 

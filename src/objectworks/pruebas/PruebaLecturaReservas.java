@@ -79,7 +79,30 @@ public class PruebaLecturaReservas {
                 Reserva guardada = dao.buscarPorId(id);
 
                 System.out.println("Reserva guardada: " + guardada);
+
+                // Guardar sin cambios debe ser válido:
+                // comprueba que la reserva no entra en conflicto consigo misma.
+                Reserva propuesta = dao.buscarPorId(id);
+                dao.actualizar(propuesta);
+
+                System.out.println("Actualización sin cambios: correcta");
+
+                // Ampliamos una noche la reserva de prueba.
+                propuesta.setFechaSalida(
+                        propuesta.getFechaSalida().plusDays(1)
+                );
+
+                dao.actualizar(propuesta);
+
+                // Volvemos a leer para comprobar lo realmente almacenado.
+                Reserva modificada = dao.buscarPorId(id);
+
+                System.out.println("Reserva modificada: " + modificada);
+                System.out.println("Noches: " + modificada.calcularNoches());
+                System.out.println("Importe: " + modificada.getImporte());
             }
+
+
 
         } catch (Exception e) {
             e.printStackTrace();
